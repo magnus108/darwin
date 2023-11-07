@@ -11,7 +11,7 @@
 
   outputs = inputs@{ nixpkgs, home-manager, darwin, ... }: {
     darwinConfigurations = {
-      hostname = darwin.lib.darwinSystem {
+      Magnuss-MacBook-Pro = darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
           ./configuration.nix
