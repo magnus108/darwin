@@ -51,6 +51,7 @@
     };
 
     programs = {
+        gh.enable = true;
 
         noti.enable = true;
         navi.enable = true;
