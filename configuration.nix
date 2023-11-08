@@ -8,20 +8,27 @@
   };
 
 
-  environment.systemPackages =
-    [ pkgs.neovim
-      pkgs.dotnet-sdk
-      pkgs.git
-      pkgs.zip
-      pkgs.unzip
-      pkgs.tig
-      pkgs.gh
-      pkgs.docker
-      pkgs.jetbrains.rider
-      pkgs.zsh
-      pkgs.telepresence2
-      pkgs.kubectl
-    ];
+  environment = {
+    shells = with pkgs; [ zsh ];
+    variables = {
+      EDITOR = "nvim";
+      VISUAL = "nvim";
+    };
+    systemPackages = with pkgs; [
+            neovim
+            dotnet-sdk
+            git
+            zip
+            unzip
+            tig
+            gh
+            docker
+            jetbrains.rider
+            zsh
+            telepresence2
+            kubectl
+        ];
+    };
 
   nixpkgs.config = { allowUnfree = true; };
 
@@ -84,7 +91,7 @@
         neovim = {
             enable = true;
             viAlias = true;
-            extraConfig = vimrc;
+            extraConfig = builtins.readFile ./vimrc.vim;
             vimAlias = true;
             vimdiffAlias = true;
             withNodeJs = true;
@@ -111,7 +118,7 @@
                 expireDuplicatesFirst = true;
                 share = true;
             };
-     syntaxHighlighting.enable = true;
+            syntaxHighlighting.enable = true;
             enableAutosuggestions = true;
             oh-my-zsh = {
                 enable = true;
