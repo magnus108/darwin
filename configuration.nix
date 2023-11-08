@@ -1,8 +1,5 @@
 { config, pkgs, ... }:
 
-let
-    vimrc = builtins.readFile ./vimrc.vim;
-in
 {
 
   users.users.magnus = {
@@ -97,36 +94,10 @@ in
                 haskell-vim
                 coc-nvim
             ];
+
             coc = {
                 enable = true;
-                settings = ''
-			{
-			    "coc.preferences.formatOnSaveFiletypes": ["*"],
-			    "languageserver": {
-				"haskell": {
-				"command": "haskell-language-server",
-				"args": ["--lsp"],
-				"rootpatterns": [ "*.cabal", "stack.yaml", "cabal.project", "package.yaml", "hie.yaml" ],
-				"filetypes": ["haskell", "lhaskell"],
-				"settings": {
-				    "haskell": {
-				    "checkparents": "checkonsave",
-				    "checkproject": true,
-				    "maxcompletions": 40,
-				    "formattingprovider": "ormolu",
-				    "plugin": {
-					"tactic": { "globalon": true },
-					"haddockComments": { "globalon": true },
-					"stan": { "globalon": true },
-					"hlint": { "globalon": true }
-					    }
-					}
-				    }
-				}
-			    }
-			}
-
-		'';
+                settings = builtins.fromJSON (builtins.readFile ./coc-settings.json);
             };
 
         };
@@ -140,7 +111,7 @@ in
                 expireDuplicatesFirst = true;
                 share = true;
             };
-	    syntaxHighlighting.enable = true;
+     syntaxHighlighting.enable = true;
             enableAutosuggestions = true;
             oh-my-zsh = {
                 enable = true;
