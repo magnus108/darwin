@@ -2,6 +2,11 @@
 
 {
 
+  nix.settings = {
+    substituters = [ "https://cache.iog.io" ];
+    trusted-public-keys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" ];
+  };
+
   users.users.magnus = {
     home = "/Users/magnus";
     shell = pkgs.zsh;
@@ -15,7 +20,8 @@
     };
     systemPackages = with pkgs; [
       neovim
-      dotnet-sdk
+      openlens
+      dotnet-sdk_7
       git
       zip
       unzip
@@ -47,7 +53,15 @@
     home = { stateVersion = "22.05"; };
 
     programs = {
-      gh.enable = true;
+      gh = {
+        enable = true;
+        extensions = [
+        ];
+      };
+      gh-dash = {
+        enable = true;
+      };
+
 
       noti.enable = true;
       navi.enable = true;
