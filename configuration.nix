@@ -20,7 +20,7 @@
     };
     systemPackages = with pkgs; [
       neovim
-      openlens
+      #openlens
       dotnet-sdk_7
       git
       zip
@@ -70,6 +70,15 @@
         enable = true;
         theme = "Monokai Pro";
         darwinLaunchOptions = [ "--single-instance" "--directory=~" ];
+      };
+      tmux = {
+        enable = true;
+        mouse = true;
+        historyLimit = 10240;
+        keyMode = "vi";
+        newSession = true;
+        shortcut = "a";
+        terminal = "screen-256color";
       };
 
       git = {
