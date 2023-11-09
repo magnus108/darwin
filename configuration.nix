@@ -91,7 +91,8 @@
       package = pkgs.skhd;
       skhdConfig = ''
         # Open Terminal
-        # alt - return : /Applications/kitty.App/Contents/MacOS/alacritty
+        lalt - return : open -na kitty
+        lalt + shift - return : open -na Safari
 
         # Toggle Window
         lalt - t : yabai -m window --toggle float && yabai -m window --grid 4:4:1:1:2:2
