@@ -198,14 +198,14 @@
     home = { stateVersion = "22.05"; };
 
     programs = {
-      gh = {
-        enable = true;
-        extensions = [
-        ];
-      };
-      gh-dash = {
-        enable = true;
-      };
+      #gh = {
+      #  enable = true;
+      #  extensions = [
+      #  ];
+      #};
+      #gh-dash = {
+      #  enable = true;
+      #};
 
 
       noti.enable = true;
