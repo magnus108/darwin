@@ -14,14 +14,18 @@
 
   environment = {
     shells = with pkgs; [ zsh ];
+
     variables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
     };
+
     systemPackages = with pkgs; [
       neovim
       #openlens
+      ripgrep
       dotnet-sdk_7
+      fzf
       git
       zip
       unzip
@@ -81,10 +85,47 @@
 
   services = {
 
-    spacebar = {
-      enable = true;
-      package = pkgs.spacebar;
-    };
+    #spacebar = {
+    #enable = true;
+    #package = pkgs.spacebar;
+    #config = {
+    #position = "bottom";
+    #display = "all";
+    #height = 26;
+    #title = "off";
+    #spaces = "off";
+    #clock = "off";
+    #power = "off";
+    #padding_left = 20;
+    #padding_right = 20;
+    #spacing_left = 25;
+    #spacing_right = 15;
+    #text_font = ''"FiraCode:Regular:12.0"'';
+    #icon_font = ''"Font Awesome 6 Free:Solid:12.0"'';
+    #background_color = "0xff202020";
+    #foreground_color = "0xffa8a8a8";
+    #power_icon_color = "0xffcd950c";
+    #battery_icon_color = "0xffd75f5f";
+    #dnd_icon_color = "0xffa8a8a8";
+    #clock_icon_color = "0xffa8a8a8";
+    #power_icon_strip = " ";
+    #space_icon = "•";
+    #space_icon_strip = "1 2 3 4 5 6 7 8 9 10";
+    #spaces_for_all_displays = "on";
+    #display_separator = "on";
+    #display_separator_icon = "";
+    #space_icon_color = "0xff458588";
+    #space_icon_color_secondary = "0xff78c4d4";
+    #space_icon_color_tertiary = "0xfffff9b0";
+    #clock_icon = "";
+    #dnd_icon = "";
+    #clock_format = ''"%d/%m/%y %R"'';
+    #right_shell = "on";
+    #right_shell_icon = "";
+    #right_shell_command = "whoami";
+
+    #};
+    #};
 
     skhd = {
       enable = true;
@@ -100,43 +141,24 @@
         lalt - q : yabai -m window --close
 
         # Focus Window
-        lalt - up : yabai -m window --focus north
-        lalt - down : yabai -m window --focus south
-        lalt - left : yabai -m window --focus west
-        lalt - right : yabai -m window --focus east
+        lalt - k : yabai -m window --focus north
+        lalt - j : yabai -m window --focus south
+        lalt - h : yabai -m window --focus west
+        lalt - l : yabai -m window --focus east
 
         # Swap Window
-        shift + lalt - up : yabai -m window --swap north
-        shift + lalt - down : yabai -m window --swap south
-        shift + lalt - left : yabai -m window --swap west
-        shift + lalt - right : yabai -m window --swap east
+        shift + lalt - k : yabai -m window --swap north
+        shift + lalt - j : yabai -m window --swap south
+        shift + lalt - h : yabai -m window --swap west
+        shift + lalt - l : yabai -m window --swap east
 
-        # Resize Window
-        shift + cmd - left : yabai -m window --resize left:-50:0 && yabai -m window --resize right:-50:0
-        shift + cmd - right : yabai -m window --resize left:50:0 && yabai -m window --resize right:50:0
-        shift + cmd - up : yabai -m window --resize up:-50:0 && yabai -m window --resize down:-50:0
-        shift + cmd - down : yabai -m window --resize up:-50:0 && yabai -m window --resize down:-50:0
-
-        # Focus Space
-        ctrl - 1 : yabai -m space --focus 1
-        ctrl - 2 : yabai -m space --focus 2
-        ctrl - 3 : yabai -m space --focus 3
-        ctrl - 4 : yabai -m space --focus 4
-        ctrl - 5 : yabai -m space --focus 5
-        #ctrl - left : yabai -m space --focus prev
-        #ctrl - right: yabai -m space --focus next
+        # Focus display (for now)
+        lalt - 1 : yabai -m display --focus 1
+        lalt - 2 : yabai -m display --focus 2
 
         # Send to Space
-        shift + ctrl - 1 : yabai -m window --space 1
-        shift + ctrl - 2 : yabai -m window --space 2
-        shift + ctrl - 3 : yabai -m window --space 3
-        shift + ctrl - 4 : yabai -m window --space 4
-        shift + ctrl - 5 : yabai -m window --space 5
-        shift + ctrl - left : yabai -m window --space prev && yabai -m space --focus prev
-        shift + ctrl - right : yabai -m window --space next && yabai -m space --focus next
-
-        # Menu
-        #cmd + space : for now its using the default keybinding to open Spotlight Search
+        shift + lalt - 1 : yabai -m window --space 1
+        shift + lalt - 2 : yabai -m window --space 2
       '';
     };
 
@@ -144,20 +166,29 @@
       enable = true;
       package = pkgs.yabai;
       config = {
-        # Extra Config
         layout = "bsp";
-        auto_balance = "off";
-        split_ratio = "0.50";
-        window_border = "on";
-        window_border_width = "2";
-        window_placement = "second_child";
-        focus_follows_mouse = "autoraise";
-        mouse_follows_focus = "off";
+
         top_padding = "10";
         bottom_padding = "10";
         left_padding = "10";
         right_padding = "10";
         window_gap = "10";
+
+        auto_balance = "off";
+        split_ratio = "0.50";
+
+        window_placement = "second_child";
+
+        focus_follows_mouse = "autofocus";
+        mouse_follows_focus = "off";
+
+        window_topmost = "on";
+        window_shadow = "float";
+        window_opacity = "on";
+        active_window_opacity = "1.0";
+        normal_window_opacity = "0.9";
+
+        external_bar = "all:0:26";
       };
     };
   };
@@ -228,7 +259,7 @@
         vimdiffAlias = true;
         withNodeJs = true;
         withPython3 = true;
-        plugins = with pkgs.vimPlugins; [ vim-nix haskell-vim coc-nvim ];
+        plugins = with pkgs.vimPlugins; [ vim-nix haskell-vim coc-nvim nvim-fzf ];
 
         coc = {
           enable = true;
@@ -251,7 +282,7 @@
         oh-my-zsh = {
           enable = true;
           theme = "ys";
-          plugins = [ "git" "sudo" "tig" ];
+          plugins = [ "git" "sudo" "tig" "fzf" ];
         };
       };
     };
