@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 {
-
-
   nix.settings = {
     substituters = [ "https://cache.iog.io" ];
     trusted-public-keys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" ];
@@ -58,11 +56,12 @@
     stateVersion = 4;
     defaults = {
       NSGlobalDomain = {
+        InitialKeyRepeat = 1;
         KeyRepeat = 1;
         NSAutomaticCapitalizationEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
         AppleKeyboardUIMode = 3;
-        AppleFontSmoothing = 1;
+        AppleFontSmoothing = 2;
         _HIHideMenuBar = true;
       };
       dock = {
@@ -70,9 +69,12 @@
         orientation = "bottom";
         showhidden = true;
         tilesize = 40;
+        static-only = true;
+        show-recents = false;
       };
       finder = {
-        QuitMenuItem = false;
+        ShowPathbar = true;
+        FXEnableExtensionChangeWarning = false;
       };
       trackpad = {
         Clicking = true;
@@ -81,6 +83,7 @@
     };
     keyboard = {
       enableKeyMapping = true;
+      remapCapsLockToControl = true;
     };
   };
 
@@ -215,6 +218,16 @@
         enable = true;
         theme = "Monokai Pro";
         darwinLaunchOptions = [ "--single-instance" "--directory=~" ];
+        settings = {
+          scrollback_lines = 10000;
+          enable_audio_bell = false;
+          update_check_interval = 0;
+          #font_family = "FiraCode Nerd Font Mono";
+          #font_family = "American Typewriter";
+          #font_size = 11;
+        };
+        font.size = 11;
+        font.name = "FiraCode Nerd Font Bold";
       };
 
       tmux = {
@@ -224,6 +237,10 @@
         keyMode = "vi";
         newSession = true;
         terminal = "screen-256color";
+        shortcut = "a";
+        extraConfig = ''
+          set -g status off
+        '';
       };
 
       git = {
@@ -283,7 +300,10 @@
         oh-my-zsh = {
           enable = true;
           theme = "ys";
-          plugins = [ "git" "sudo" "tig" "fzf" ];
+          plugins = [ "tmux" "git" "sudo" "tig" "fzf" ];
+          extraConfig = ''
+            ZSH_TMUX_AUTOSTART=true
+          '';
         };
       };
     };
