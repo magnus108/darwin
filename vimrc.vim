@@ -40,12 +40,13 @@ set spell
 set startofline
 set noswapfile
 set tabstop=4
-set termguicolors
 set title
 set undolevels=5000
 set visualbell
 set wildmenu
 set nowrap
+
+autocmd CursorMoved * normal zz
 
 " Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
 " delays and poor user experience
@@ -249,3 +250,44 @@ function! s:WingmanUseCtor(type)
   call CocAction('codeAction', a:type, ['refactor.wingman.useConstructor'])
   call <SID>GotoNextHole()
 endfunction
+
+
+
+
+
+
+" Initialize configuration dictionary
+let g:fzf_vim = {}
+" This is the default option:
+"   - Preview window on the right with 50% width
+"   - CTRL-/ will toggle preview window.
+" - Note that this array is passed as arguments to fzf#vim#with_preview function.
+" - To learn more about preview window options, see `--preview-window` section of `man fzf`.
+let g:fzf_vim.preview_window = ['right,50%', 'ctrl-/']
+
+" fzf.vim needs bash to display the preview window.
+" On Windows, fzf.vim will first see if bash is in $PATH, then if
+" Git bash (C:\Program Files\Git\bin\bash.exe) is available.
+" If you want it to use a different bash, set this variable.
+"   let g:fzf_vim = {}
+"   let g:fzf_vim.preview_bash = 'C:\Git\bin\bash.exe'
+" [Buffers] Jump to the existing window if possible
+let g:fzf_vim.buffers_jump = 1
+
+" [[B]Commits] Customize the options used by 'git log':
+let g:fzf_vim.commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+" [Tags] Command to generate tags file
+let g:fzf_vim.tags_command = 'ctags -R'
+
+" [Commands] --expect expression for directly executing the command
+let g:fzf_vim.commands_expect = 'alt-enter,ctrl-x'
+
+nnoremap <Leader>f :Files<CR>
+
+nnoremap <Leader>b :Buffers<CR>
+
+command! -bang -nargs=* GGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number -- '.fzf#shellescape(<q-args>),
+  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)

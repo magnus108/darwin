@@ -222,9 +222,7 @@
           scrollback_lines = 10000;
           enable_audio_bell = false;
           update_check_interval = 0;
-          #font_family = "FiraCode Nerd Font Mono";
-          #font_family = "American Typewriter";
-          #font_size = 11;
+          hide_window_decorations = "titlebar-only";
         };
         font.size = 11;
         font.name = "FiraCode Nerd Font Bold";
@@ -277,7 +275,7 @@
         vimdiffAlias = true;
         withNodeJs = true;
         withPython3 = true;
-        plugins = with pkgs.vimPlugins; [ vim-nix haskell-vim coc-nvim nvim-fzf ];
+        plugins = with pkgs.vimPlugins; [ vim-nix fzf-vim haskell-vim coc-nvim ];
 
         coc = {
           enable = true;
