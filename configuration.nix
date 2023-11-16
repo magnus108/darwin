@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 
 {
   nix.settings = {
@@ -20,8 +20,9 @@
     };
 
     systemPackages = with pkgs; [
-      neovim
       #openlens
+      neovim
+      ranger
       ripgrep
       dotnet-sdk_7
       fzf
@@ -38,6 +39,7 @@
       nixpkgs-fmt
       nil
       nodePackages.vscode-json-languageserver
+      kitty
     ];
   };
 
@@ -56,8 +58,8 @@
     stateVersion = 4;
     defaults = {
       NSGlobalDomain = {
-        InitialKeyRepeat = 1;
         KeyRepeat = 1;
+        InitialKeyRepeat = 8;
         NSAutomaticCapitalizationEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
         AppleKeyboardUIMode = 3;
@@ -136,7 +138,7 @@
       package = pkgs.skhd;
       skhdConfig = ''
         # Open Terminal
-        lalt - return : open -na kitty
+        lalt + return : open -na kitty
         lalt + shift - return : open -na Safari
 
         # Toggle Window
@@ -219,10 +221,12 @@
         theme = "Monokai Pro";
         darwinLaunchOptions = [ "--single-instance" "--directory=~" ];
         settings = {
-          scrollback_lines = 10000;
           enable_audio_bell = false;
-          update_check_interval = 0;
+          update_check_interval = 24;
           hide_window_decorations = "titlebar-only";
+          confirm_os_window_close = -1;
+          clear_all_mouse_actions = "yes";
+          clear_all_shortcuts = "yes";
         };
         font.size = 11;
         font.name = "FiraCode Nerd Font Bold";
@@ -230,14 +234,47 @@
 
       tmux = {
         enable = true;
+        plugins = with pkgs.tmuxPlugins; [
+          tmux-fzf
+          vim-tmux-navigator
+          cpu
+          resurrect
+          continuum
+        ];
         historyLimit = 10240;
         mouse = true;
         keyMode = "vi";
         newSession = true;
         terminal = "screen-256color";
         shortcut = "a";
+        disableConfirmationPrompt = true;
         extraConfig = ''
           set -g status off
+
+          # Smart pane switching with awareness of Vim splits.
+          # See: https://github.com/christoomey/vim-tmux-navigator
+          is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
+              | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+          bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h'  'select-pane -L'
+          bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j'  'select-pane -D'
+          bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k'  'select-pane -U'
+          bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l'  'select-pane -R'
+          tmux_version='$(tmux -V | sed -En "s/^tmux ([0-9]+(.[0-9]+)?).*/\1/p")'
+          if-shell -b '[ "$(echo "$tmux_version < 3.0" | bc)" = 1 ]' \
+              "bind-key -n 'C-\\' if-shell \"$is_vim\" 'send-keys C-\\'  'select-pane -l'"
+          if-shell -b '[ "$(echo "$tmux_version >= 3.0" | bc)" = 1 ]' \
+              "bind-key -n 'C-\\' if-shell \"$is_vim\" 'send-keys C-\\\\'  'select-pane -l'"
+
+          bind-key -T copy-mode-vi 'C-h' select-pane -L
+          bind-key -T copy-mode-vi 'C-j' select-pane -D
+          bind-key -T copy-mode-vi 'C-k' select-pane -U
+          bind-key -T copy-mode-vi 'C-l' select-pane -R
+          bind-key -T copy-mode-vi 'C-\' select-pane -l
+
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '10' # minutes
+          set -g @continuum-boot-options 'kitty'
+          set -g @resurrect-strategy-nvim 'session'
         '';
       };
 
@@ -267,6 +304,10 @@
         };
       };
 
+      fzf = {
+        tmux.enableShellIntegration = true;
+      };
+
       neovim = {
         enable = true;
         viAlias = true;
@@ -275,7 +316,7 @@
         vimdiffAlias = true;
         withNodeJs = true;
         withPython3 = true;
-        plugins = with pkgs.vimPlugins; [ vim-nix fzf-vim haskell-vim coc-nvim ];
+        plugins = with pkgs.vimPlugins; [ vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
 
         coc = {
           enable = true;

@@ -291,3 +291,11 @@ command! -bang -nargs=* GGrep
   \ call fzf#vim#grep(
   \   'git grep --line-number -- '.fzf#shellescape(<q-args>),
   \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
+
+
+let g:tmux_navigator_no_mappings = 1
+
+noremap <silent> <c-h> :<C-U>TmuxNavigateLeft<cr>
+noremap <silent> <c-j> :<C-U>TmuxNavigateDown<cr>
+noremap <silent> <c-k> :<C-U>TmuxNavigateUp<cr>
+noremap <silent> <c-l> :<C-U>TmuxNavigateRight<cr>
