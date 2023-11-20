@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   nix.settings = {
@@ -138,7 +138,7 @@
       package = pkgs.skhd;
       skhdConfig = ''
         # Open Terminal
-        lalt + return : open -na kitty
+        lalt - return : open -na kitty
         lalt + shift - return : open -na Safari
 
         # Toggle Window
@@ -224,7 +224,7 @@
           enable_audio_bell = false;
           update_check_interval = 24;
           hide_window_decorations = "titlebar-only";
-          confirm_os_window_close = -1;
+          confirm_os_window_close = 0;
           clear_all_mouse_actions = "yes";
           clear_all_shortcuts = "yes";
         };
@@ -238,8 +238,22 @@
           tmux-fzf
           vim-tmux-navigator
           cpu
-          resurrect
-          continuum
+          {
+            plugin = resurrect;
+            extraConfig = ''
+              set -g @resurrect-strategy-nvim 'session'
+              set -g @resurrect-capture-pane-contents 'on'
+            '';
+          }
+          {
+            plugin = continuum;
+            extraConfig = ''
+              set -g @continuum-boot 'on'
+              set -g @continuum-restore 'on'
+              set -g @continuum-save-interval '10' # minutes
+              set -g @continuum-boot-options 'kitty'
+            '';
+          }
         ];
         historyLimit = 10240;
         mouse = true;
@@ -249,7 +263,7 @@
         shortcut = "a";
         disableConfirmationPrompt = true;
         extraConfig = ''
-          set -g status off
+          set -g status on
 
           # Smart pane switching with awareness of Vim splits.
           # See: https://github.com/christoomey/vim-tmux-navigator
@@ -271,10 +285,6 @@
           bind-key -T copy-mode-vi 'C-l' select-pane -R
           bind-key -T copy-mode-vi 'C-\' select-pane -l
 
-          set -g @continuum-restore 'on'
-          set -g @continuum-save-interval '10' # minutes
-          set -g @continuum-boot-options 'kitty'
-          set -g @resurrect-strategy-nvim 'session'
         '';
       };
 
@@ -287,7 +297,10 @@
           core.autocrlf = "input";
           color.ut = "auto";
           branch.autoSetupRebase = "always";
+
+          push.autoSetupRebase = true;
           push.default = "simple";
+
           pull.rebase = "merges";
           rerere.enabled = true;
           rebase.abbreviateCommands = true;
@@ -316,7 +329,7 @@
         vimdiffAlias = true;
         withNodeJs = true;
         withPython3 = true;
-        plugins = with pkgs.vimPlugins; [ vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
+        plugins = with pkgs.vimPlugins; [ vim-obsession vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
 
         coc = {
           enable = true;
@@ -339,10 +352,7 @@
         oh-my-zsh = {
           enable = true;
           theme = "ys";
-          plugins = [ "tmux" "git" "sudo" "tig" "fzf" ];
-          extraConfig = ''
-            ZSH_TMUX_AUTOSTART=true
-          '';
+          plugins = [ "tmux" "fzf" ];
         };
       };
     };
