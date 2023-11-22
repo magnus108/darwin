@@ -31,6 +31,8 @@
       unzip
       tig
       gh
+      nodejs_20
+      dbeaver
       docker
       jetbrains.rider
       zsh
@@ -225,15 +227,27 @@
           update_check_interval = 24;
           hide_window_decorations = "titlebar-only";
           confirm_os_window_close = 0;
-          clear_all_mouse_actions = "yes";
-          clear_all_shortcuts = "yes";
+          #clear_all_mouse_actions = "yes";
+          #clear_all_shortcuts = "yes";
+          mouse_hide_wait = 3;
         };
         font.size = 11;
         font.name = "FiraCode Nerd Font Bold";
+        extraConfig = ''
+          map cmd+c        copy_to_clipboard
+          map cmd+v        paste_from_clipboard
+        '';
       };
 
       tmux = {
         enable = true;
+        baseIndex = 1;
+        historyLimit = 10240;
+        mouse = true;
+        keyMode = "vi";
+        terminal = "screen-256color";
+        shortcut = "a";
+        disableConfirmationPrompt = true;
         plugins = with pkgs.tmuxPlugins; [
           tmux-fzf
           vim-tmux-navigator
@@ -255,15 +269,8 @@
             '';
           }
         ];
-        historyLimit = 10240;
-        mouse = true;
-        keyMode = "vi";
-        newSession = true;
-        terminal = "screen-256color";
-        shortcut = "a";
-        disableConfirmationPrompt = true;
         extraConfig = ''
-          set -g status on
+          set -g status off
 
           # Smart pane switching with awareness of Vim splits.
           # See: https://github.com/christoomey/vim-tmux-navigator
@@ -329,7 +336,7 @@
         vimdiffAlias = true;
         withNodeJs = true;
         withPython3 = true;
-        plugins = with pkgs.vimPlugins; [ vim-obsession vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
+        plugins = with pkgs.vimPlugins; [ ranger-vim vim-obsession vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
 
         coc = {
           enable = true;
@@ -344,10 +351,12 @@
           size = 102400;
           save = 102400;
           ignoreDups = true;
-          expireDuplicatesFirst = true;
+          ignoreAllDups = true;
           share = true;
         };
-        syntaxHighlighting.enable = true;
+        syntaxHighlighting = {
+          enable = true;
+        };
         enableAutosuggestions = true;
         oh-my-zsh = {
           enable = true;

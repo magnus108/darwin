@@ -42,6 +42,8 @@ set noswapfile
 set tabstop=4
 set title
 set undolevels=5000
+set undofile
+set undodir=~/.vim/undodir
 set visualbell
 set wildmenu
 set nowrap
