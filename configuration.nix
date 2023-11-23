@@ -35,6 +35,7 @@
       dbeaver
       docker
       jetbrains.rider
+      jetbrains.webstorm
       zsh
       telepresence2
       kubectl
