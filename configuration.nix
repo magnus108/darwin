@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   nix.settings = {
@@ -25,6 +25,7 @@
       ranger
       ripgrep
       dotnet-sdk_7
+      highlight
       fzf
       git
       zip
@@ -188,7 +189,7 @@
 
         window_placement = "second_child";
 
-        focus_follows_mouse = "autofocus";
+        focus_follows_mouse = "off";
         mouse_follows_focus = "off";
 
         window_topmost = "on";
@@ -202,8 +203,12 @@
     };
   };
 
-  home-manager.users.magnus = {
+  home-manager.users.magnus = { lib, ... }: {
     home = { stateVersion = "22.05"; };
+    home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
+      ''
+        ln -sfn $HOME/Documents/private/darwin/.tigrc $HOME/.tigrc
+      '';
 
     programs = {
       #gh = {
@@ -293,6 +298,9 @@
           bind-key -T copy-mode-vi 'C-l' select-pane -R
           bind-key -T copy-mode-vi 'C-\' select-pane -l
 
+
+          # Really?
+          # set -ga terminal-overrides ",xterm-kitty:Tc"
         '';
       };
 
@@ -302,26 +310,55 @@
         userEmail = "magnus108@me.com";
         lfs.enable = true;
         extraConfig = {
-          core.autocrlf = "input";
+          core = {
+            excludesfile = ''
+              *~
+              .*.swp
+              .DS_Store
+            '';
+            autocrlf = "input";
+          };
+
           color.ut = "auto";
           branch.autoSetupRebase = "always";
 
-          push.autoSetupRebase = true;
-          push.default = "simple";
+          merge = {
+            ff = "only";
+          };
 
-          pull.rebase = "merges";
+          pull = {
+            rebase = "merges";
+          };
+
+          push = {
+            autoSetupRebase = true;
+            default = "simple";
+          };
+
           rerere.enabled = true;
-          rebase.abbreviateCommands = true;
+
+          rebase = {
+            autoSquash = true;
+            abbreviateCommands = true;
+          };
+
           mergetool.vimdiff.cmd =
             "nvim -d $LOCAL $MERGED $BASE $REMOTE -c 'wincmd w' -c 'wincmd j'";
+
           merge = {
             tool = "vimdiff";
             conflictStyle = "diff3";
           };
+
           diff = {
             tool = "vimdiff";
             mnemonicprefix = true;
           };
+
+          grep = {
+            lineNumber = true;
+          };
+
         };
       };
 
