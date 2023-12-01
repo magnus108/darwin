@@ -1,17 +1,19 @@
 syntax on
 
+set filetype indent on
+
 let mapleader = "\<Esc>"
 
+set cursorline
 set autochdir
 set autoindent
 set autoread
 set background=dark
-set backspace=indent,eol,start
 set colorcolumn=80
+set backspace=indent,eol,start
 set completeopt=menuone,longest,preview
 set confirm
 set copyindent
-set expandtab
 set history=5000
 set hlsearch
 set ignorecase
@@ -23,27 +25,30 @@ set listchars=tab:>-,trail:-,precedes:<,extends:>
 set magic
 set nofoldenable
 set nolinebreak
-set noswapfile
 set number
-set preserveindent
 set relativenumber
 set ruler
 set rulerformat=%c\ %L\ %P
-set shiftround
-set shiftwidth=4
 set showmatch
 set showmode
 set showtabline=2
 set smartcase
 set smarttab
+set expandtab
+set tabstop=4
+set shiftround
+set shiftwidth=4
+set preserveindent
 set spell
 set startofline
-set noswapfile
-set tabstop=4
+set swapfile
+set backupdir=~/.vim/backupdir
+set dir=~/.cache/vim
 set title
 set undolevels=5000
 set undofile
 set undodir=~/.vim/undodir
+set noerrorbells
 set visualbell
 set wildmenu
 set nowrap

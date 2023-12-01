@@ -1,4 +1,9 @@
 {
+    "suggest.noselect": true,
+    "suggest.enablePreview": true,
+    "suggest.enablePreselect": false,
+    "suggest.disableKind": true,
+    "codeLens.enable": true,
     "coc.preferences.formatOnSaveFiletypes": [
         "*"
     ],

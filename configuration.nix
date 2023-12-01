@@ -22,9 +22,12 @@
     systemPackages = with pkgs; [
       #openlens
       neovim
+      feh
+      mpv
+      graphviz
       ranger
       ripgrep
-      dotnet-sdk_7
+      dotnet-sdk_8
       highlight
       fzf
       git
@@ -139,7 +142,6 @@
 
     skhd = {
       enable = true;
-      package = pkgs.skhd;
       skhdConfig = ''
         # Open Terminal
         lalt - return : open -na kitty
@@ -174,7 +176,6 @@
 
     yabai = {
       enable = true;
-      package = pkgs.yabai;
       config = {
         layout = "bsp";
 
@@ -220,7 +221,6 @@
       #  enable = true;
       #};
 
-
       noti.enable = true;
       navi.enable = true;
 
@@ -254,6 +254,7 @@
         terminal = "screen-256color";
         shortcut = "a";
         disableConfirmationPrompt = true;
+        #fix
         plugins = with pkgs.tmuxPlugins; [
           tmux-fzf
           vim-tmux-navigator
@@ -332,6 +333,7 @@
 
           push = {
             autoSetupRebase = true;
+            autoSetupRemote = true;
             default = "simple";
           };
 
@@ -368,14 +370,17 @@
 
       neovim = {
         enable = true;
-        viAlias = true;
+        #fix
         extraConfig = builtins.readFile ./vimrc.vim;
+        viAlias = true;
         vimAlias = true;
         vimdiffAlias = true;
         withNodeJs = true;
         withPython3 = true;
+        withRuby = true;
         plugins = with pkgs.vimPlugins; [ ranger-vim vim-obsession vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
 
+        #fix
         coc = {
           enable = true;
           settings = builtins.fromJSON (builtins.readFile ./coc-settings.json);
@@ -399,7 +404,7 @@
         oh-my-zsh = {
           enable = true;
           theme = "ys";
-          plugins = [ "tmux" "fzf" ];
+          plugins = [ "tmux" "fzf" "dotnet" ];
         };
       };
     };
