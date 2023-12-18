@@ -29,6 +29,7 @@
       ripgrep
       dotnet-sdk_8
       highlight
+      mono
       fzf
       git
       zip
@@ -39,7 +40,8 @@
       dbeaver
       docker
       jetbrains.rider
-      jetbrains.webstorm
+      #jetbrains.webstorm
+      vscode
       zsh
       telepresence2
       kubectl
@@ -47,6 +49,8 @@
       nil
       nodePackages.vscode-json-languageserver
       kitty
+      # fix
+      #qutebrowser-qt5
     ];
   };
 
@@ -204,7 +208,7 @@
     };
   };
 
-  home-manager.users.magnus = { lib, ... }: {
+  home-manager.users.magnus = { lib, pkgs, ... }: {
     home = { stateVersion = "22.05"; };
     home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
       ''
@@ -224,9 +228,14 @@
       noti.enable = true;
       navi.enable = true;
 
+      #qutebrowser = {
+      #  enable = true;
+      #  package = pkgs.qutebrowser-qt5;
+      #};
+
       kitty = {
         enable = true;
-        theme = "Monokai Pro";
+        theme = "Arthur";
         darwinLaunchOptions = [ "--single-instance" "--directory=~" ];
         settings = {
           enable_audio_bell = false;
@@ -378,7 +387,26 @@
         withNodeJs = true;
         withPython3 = true;
         withRuby = true;
-        plugins = with pkgs.vimPlugins; [ ranger-vim vim-obsession vim-tmux-navigator vim-nix fzf-vim haskell-vim coc-nvim ];
+        plugins = with pkgs.vimPlugins; [
+          which-key-nvim
+          vim-easymotion
+          ranger-vim
+          vim-obsession
+          vim-tmux-navigator
+          vim-nix
+          fzf-vim
+          haskell-vim
+          coc-nvim
+        ];
+
+        extraLuaConfig = ''
+          -- Which-key configuration
+          require("which-key").setup {
+            -- Your configuration comes here:
+            -- or leave it empty to use the default settings
+            -- Refer to the documentation to see all available options
+          }
+        '';
 
         #fix
         coc = {

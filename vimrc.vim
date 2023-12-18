@@ -1,11 +1,10 @@
 syntax on
 
-set filetype indent on
+filetype plugin indent on
 
-let mapleader = "\<Esc>"
+let mapleader = " "
 
 set cursorline
-set autochdir
 set autoindent
 set autoread
 set background=dark
@@ -35,9 +34,9 @@ set showtabline=2
 set smartcase
 set smarttab
 set expandtab
-set tabstop=4
+set tabstop=2
 set shiftround
-set shiftwidth=4
+set shiftwidth=2
 set preserveindent
 set spell
 set startofline
@@ -52,6 +51,7 @@ set noerrorbells
 set visualbell
 set wildmenu
 set nowrap
+set timeoutlen=500
 
 autocmd CursorMoved * normal zz
 
@@ -306,3 +306,27 @@ noremap <silent> <c-h> :<C-U>TmuxNavigateLeft<cr>
 noremap <silent> <c-j> :<C-U>TmuxNavigateDown<cr>
 noremap <silent> <c-k> :<C-U>TmuxNavigateUp<cr>
 noremap <silent> <c-l> :<C-U>TmuxNavigateRight<cr>
+
+
+
+
+
+
+
+
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+
+" Jump to anywhere you want with minimal keystrokes, with just one key binding.
+" `s{char}{label}`
+nmap s <Plug>(easymotion-overwin-f)
+" or
+" `s{char}{char}{label}`
+" Need one more keystroke, but on average, it may be more comfortable.
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Turn on case-insensitive feature
+let g:EasyMotion_smartcase = 1
+
+" JK motions: Line motions
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
