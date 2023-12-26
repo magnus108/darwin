@@ -13,10 +13,13 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +1 ~/Documents/private/darwin/configuration.nix
+badd +438 ~/Documents/private/darwin/configuration.nix
+badd +87 vimrc.vim
 argglobal
 %argdel
-$argadd configuration.nix
+$argadd ~/Documents/private/darwin/configuration.nix
+tabnew +setlocal\ bufhidden=wipe
+tabrewind
 edit ~/Documents/private/darwin/configuration.nix
 argglobal
 setlocal fdm=manual
@@ -29,12 +32,32 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 12 - ((11 * winheight(0) + 12) / 24)
+let s:l = 430 - ((8 * winheight(0) + 8) / 17)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 12
-normal! 0
+keepjumps 430
+normal! 010|
+tabnext
+edit vimrc.vim
+argglobal
+balt ~/Documents/private/darwin/configuration.nix
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 74 - ((8 * winheight(0) + 8) / 17)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 74
+normal! 04|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
@@ -48,7 +71,6 @@ if filereadable(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
 set hlsearch
-nohlsearch
 let g:this_session = v:this_session
 let g:this_obsession = v:this_session
 doautoall SessionLoadPost

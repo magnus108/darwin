@@ -236,7 +236,7 @@
 
       kitty = {
         enable = true;
-        theme = "Arthur";
+        theme = "Tokyo Night";
         darwinLaunchOptions = [ "--single-instance" "--directory=~" ];
         settings = {
           enable_audio_bell = false;
@@ -391,6 +391,7 @@
         plugins = with pkgs.vimPlugins; [
           which-key-nvim
           vim-easymotion
+          vim-repeat
           ranger-vim
           vim-obsession
           vim-tmux-navigator
@@ -407,6 +408,7 @@
           nvim-cmp
           cmp-vsnip
           vim-vsnip
+          tokyonight-nvim
         ];
 
         extraLuaConfig = ''
@@ -573,8 +575,8 @@
               end,
             },
             window = {
-              -- completion = cmp.config.window.bordered(),
-              -- documentation = cmp.config.window.bordered(),
+              completion = cmp.config.window.bordered(),
+              documentation = cmp.config.window.bordered(),
             },
             mapping = cmp.mapping.preset.insert({
               ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -681,7 +683,7 @@
 
           require'lspconfig'.omnisharp.setup(config)
 
-
+          vim.cmd[[colorscheme tokyonight]]
         '';
 
         #fix
