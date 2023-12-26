@@ -13,9 +13,10 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +661 ~/Documents/private/darwin/configuration.nix
+badd +494 ~/Documents/private/darwin/configuration.nix
 badd +299 vimrc.vim
 badd +0 ../../../.omnisharp/omnisharp.json
+badd +0 coc-settings.json
 argglobal
 %argdel
 $argadd ~/Documents/private/darwin/configuration.nix
@@ -31,12 +32,12 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 661 - ((8 * winheight(0) + 8) / 17)
+let s:l = 494 - ((25 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 661
-normal! 039|
+keepjumps 494
+normal! 0
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
