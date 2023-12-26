@@ -13,13 +13,12 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +438 ~/Documents/private/darwin/configuration.nix
-badd +87 vimrc.vim
+badd +661 ~/Documents/private/darwin/configuration.nix
+badd +299 vimrc.vim
+badd +0 ../../../.omnisharp/omnisharp.json
 argglobal
 %argdel
 $argadd ~/Documents/private/darwin/configuration.nix
-tabnew +setlocal\ bufhidden=wipe
-tabrewind
 edit ~/Documents/private/darwin/configuration.nix
 argglobal
 setlocal fdm=manual
@@ -32,32 +31,12 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 430 - ((8 * winheight(0) + 8) / 17)
+let s:l = 661 - ((8 * winheight(0) + 8) / 17)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 430
-normal! 010|
-tabnext
-edit vimrc.vim
-argglobal
-balt ~/Documents/private/darwin/configuration.nix
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 74 - ((8 * winheight(0) + 8) / 17)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 74
-normal! 04|
+keepjumps 661
+normal! 039|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

@@ -508,6 +508,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
           -- Setup language servers.
           local lspconfig = require('lspconfig')
           lspconfig.pyright.setup {}
@@ -557,6 +568,12 @@
               end, opts)
             end,
           })
+
+
+
+
+
+
 
 
 
@@ -682,6 +699,14 @@
           }
 
           require'lspconfig'.omnisharp.setup(config)
+
+
+
+
+
+
+
+
 
           vim.cmd[[colorscheme tokyonight]]
         '';
