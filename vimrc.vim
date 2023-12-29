@@ -233,32 +233,6 @@ function! s:GotoNextHole()
   call <SID>JumpToNextHole()
 endfunction
 
-function! s:WingmanRefine(type)
-  call CocAction('codeAction', a:type, ['refactor.wingman.refine'])
-  call <SID>GotoNextHole()
-endfunction
-
-function! s:WingmanDestruct(type)
-  call CocAction('codeAction', a:type, ['refactor.wingman.caseSplit'])
-  call <SID>GotoNextHole()
-endfunction
-
-function! s:WingmanDestructAll(type)
-  call CocAction('codeAction', a:type, ['refactor.wingman.splitFuncArgs'])
-  call <SID>GotoNextHole()
-endfunction
-
-function! s:WingmanFillHole(type)
-  call CocAction('codeAction', a:type, ['refactor.wingman.fillHole'])
-  call <SID>GotoNextHole()
-endfunction
-
-function! s:WingmanUseCtor(type)
-  call CocAction('codeAction', a:type, ['refactor.wingman.useConstructor'])
-  call <SID>GotoNextHole()
-endfunction
-
-
 
 
 

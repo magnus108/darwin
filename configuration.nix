@@ -53,6 +53,8 @@
       # fix
       #qutebrowser-qt5
       omnisharp-roslyn
+      tree-sitter-grammars.tree-sitter-query
+      tree-sitter-grammars.tree-sitter-c
       tree-sitter-grammars.tree-sitter-c-sharp
       tree-sitter-grammars.tree-sitter-query
       tree-sitter-grammars.tree-sitter-lua
@@ -326,12 +328,9 @@
         lfs.enable = true;
         extraConfig = {
           core = {
-            excludesfile = ''
-              *~
-              .*.swp
-              .DS_Store
-            '';
+            excludesfile = "~/.gitignore";
             autocrlf = "input";
+            ignorecase = false;
           };
 
           color.ut = "auto";
@@ -420,15 +419,219 @@
           neotest-haskell
           nvim-treesitter
           plenary-nvim
+          nvim-tree-lua
+          gitsigns-nvim
+          FixCursorHold-nvim
         ];
 
         extraLuaConfig = ''
+          -- disable netrw at the very start of your init.lua
+          vim.g.loaded_netrw = 1
+          vim.g.loaded_netrwPlugin = 1
+
+
+
+
+
           -- Which-key configuration
-          require("which-key").setup {
-            -- Your configuration comes here:
-            -- or leave it empty to use the default settings
-            -- Refer to the documentation to see all available options
+          local wk = require("which-key")
+
+          wk.setup {
+            plugins = {
+                marks = true, -- shows a list of your marks on ' and `
+                registers = true, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+                -- the presets plugin, adds help for a bunch of default keybindings in Neovim
+                -- No actual key bindings are created
+                spelling = {
+                  enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+                  suggestions = 20, -- how many suggestions should be shown in the list?
+                },
+                presets = {
+                  operators = true, -- adds help for operators like d, y, ...
+                  motions = true, -- adds help for motions
+                  text_objects = true, -- help for text objects triggered after entering an operator
+                  windows = true, -- default bindings on <c-w>
+                  nav = true, -- misc bindings to work with windows
+                  z = true, -- bindings for folds, spelling and others prefixed with z
+                  g = true, -- bindings for prefixed with g
+                },
+              },
+              -- add operators that will trigger motion and text object completion
+              -- to enable all native operators, set the preset / operators plugin above
+              operators = { gc = "Comments" },
+              key_labels = {
+                -- override the label used to display some keys. It doesn't effect WK in any other way.
+                -- For example:
+                -- ["<space>"] = "SPC",
+                -- ["<cr>"] = "RET",
+                -- ["<tab>"] = "TAB",
+              },
+              motions = {
+                count = true,
+              },
+              icons = {
+                breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
+                separator = "➜", -- symbol used between a key and it's label
+                group = "+", -- symbol prepended to a group
+              },
+              popup_mappings = {
+                scroll_down = "<c-d>", -- binding to scroll down inside the popup
+                scroll_up = "<c-u>", -- binding to scroll up inside the popup
+              },
+              window = {
+                border = "none", -- none, single, double, shadow
+                position = "bottom", -- bottom, top
+                margin = { 1, 0, 1, 0 }, -- extra window margin [top, right, bottom, left]. When between 0 and 1, will be treated as a percentage of the screen size.
+                padding = { 1, 2, 1, 2 }, -- extra window padding [top, right, bottom, left]
+                winblend = 0, -- value between 0-100 0 for fully opaque and 100 for fully transparent
+                zindex = 1000, -- positive value to position WhichKey above other floating windows.
+              },
+              layout = {
+                height = { min = 4, max = 25 }, -- min and max height of the columns
+                width = { min = 20, max = 50 }, -- min and max width of the columns
+                spacing = 3, -- spacing between columns
+                align = "left", -- align columns left, center or right
+              },
+              ignore_missing = false, -- enable this to hide mappings for which you didn't specify a label
+              hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "^:", "^ ", "^call ", "^lua " }, -- hide mapping boilerplate
+              show_help = true, -- show a help message in the command line for using WhichKey
+              show_keys = true, -- show the currently pressed key and its label as a message in the command line
+              triggers = "auto", -- automatically setup triggers
+              -- triggers = {"<leader>"} -- or specifiy a list manually
+              -- list of triggers, where WhichKey should not wait for timeoutlen and show immediately
+              triggers_nowait = {
+                -- marks
+                "`",
+                "'",
+                "g`",
+                "g'",
+                -- registers
+                '"',
+                "<c-r>",
+                -- spelling
+                "z=",
+              },
+              triggers_blacklist = {
+                -- list of mode / prefixes that should never be hooked by WhichKey
+                -- this is mostly relevant for keymaps that start with a native binding
+                i = { "j", "k" },
+                v = { "j", "k" },
+              },
+              -- disable the WhichKey popup for certain buf types and file types.
+              -- Disabled by default for Telescope
+              disable = {
+                buftypes = {},
+                filetypes = {},
+              },
           }
+
+
+
+
+          local nvim_tree_bindings = {
+            ["e"] = {":NvimTreeToggle<CR>", "Toggle Nvim-Tree"},
+            ["f"] = {":NvimTreeFocus<CR>", "Focus Nvim-Tree"},
+            ["r"] = {":NvimTreeFindFile<CR>", "Reveal in Nvim-Tree"}
+          }
+
+
+          wk.register({
+            n = {
+              name = "+nvim-tree", -- Optional group name
+              nvim_tree_bindings
+            }
+          }, { prefix = "<leader>" })
+
+
+
+
+
+
+
+
+          require('gitsigns').setup {
+            signs = {
+              add          = { text = '│' },
+              change       = { text = '│' },
+              delete       = { text = '_' },
+              topdelete    = { text = '‾' },
+              changedelete = { text = '~' },
+              untracked    = { text = '┆' },
+            },
+            signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
+            numhl      = false, -- Toggle with `:Gitsigns toggle_numhl`
+            linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
+            word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
+            watch_gitdir = {
+              follow_files = true
+            },
+            attach_to_untracked = true,
+            current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+            current_line_blame_opts = {
+              virt_text = true,
+              virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+              delay = 1000,
+              ignore_whitespace = false,
+              virt_text_priority = 100,
+            },
+            current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
+            sign_priority = 6,
+            update_debounce = 100,
+            status_formatter = nil, -- Use default
+            max_file_length = 40000, -- Disable if file is longer than this (in lines)
+            preview_config = {
+              -- Options passed to nvim_open_win
+              border = 'single',
+              style = 'minimal',
+              relative = 'cursor',
+              row = 0,
+              col = 1
+            },
+            yadm = {
+              enable = false
+            },
+          }
+
+
+          local gitsigns_bindings = {
+            ["s"] = {":Gitsigns stage_hunk<CR>", "Stage Hunk"},
+            ["u"] = {":Gitsigns undo_stage_hunk<CR>", "Undo Stage Hunk"},
+            ["r"] = {":Gitsigns reset_hunk<CR>", "Reset Hunk"},
+            ["p"] = {":Gitsigns preview_hunk<CR>", "Preview Hunk"},
+            ["B"] = {":Gitsigns blame_line<cr>", "Blame line"},
+            ["b"] = {":Gitsigns toggle_current_line_blame<cr>", "Toggle blame lines"},
+          }
+
+          wk.register({
+            g = {
+              name = "+gitsigns", -- Optional group name
+              gitsigns_bindings
+            }
+          }, { prefix = "<leader>" })
+
+
+
+
+
+          require("nvim-tree").setup({
+            sort = {
+              sorter = "case_sensitive",
+            },
+            view = {
+              width = 30,
+            },
+            renderer = {
+              group_empty = true,
+            },
+            filters = {
+              dotfiles = true,
+            },
+          })
+
+
+
+
+
 
           -- Import telescope
           local telescope = require('telescope')
@@ -709,8 +912,7 @@
             analyze_open_documents_only = false,
           }
 
-          require'lspconfig'.omnisharp.setup(config)
-
+          lspconfig.omnisharp.setup(config)
 
 
 
@@ -880,7 +1082,26 @@
 
           require("neotest").setup({
             adapters = {
-              require("neotest-dotnet"),
+              require("neotest-dotnet")({
+                    -- Extra arguments for nvim-dap configuration
+                    -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
+                    dap = { justMyCode = false },
+                    -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
+                    -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
+                    custom_attributes = {
+                      xunit = { "MyCustomFactAttribute" },
+                      nunit = { "MyCustomTestAttribute" },
+                      mstest = { "MyCustomTestMethodAttribute" }
+                    },
+                    -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
+                    dotnet_additional_args = {
+                      "--verbosity detailed"
+                    },
+                    -- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
+                    -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
+                    --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
+                    discovery_root = "solution" -- Default
+                  })
             },
             diagnostics = {
                 enabled = true,  -- Ensure diagnostics are enabled
