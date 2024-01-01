@@ -13,13 +13,15 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +422 ~/Documents/private/darwin/configuration.nix
-badd +195 vimrc.vim
+badd +398 ~/Documents/private/darwin/configuration.nix
+badd +58 vimrc.vim
 badd +1 ../../../.omnisharp/omnisharp.json
-badd +1 coc-settings.json
+badd +38 coc-settings.json
+badd +6 health://
 argglobal
 %argdel
 $argadd ~/Documents/private/darwin/configuration.nix
+tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabrewind
 edit ~/Documents/private/darwin/configuration.nix
@@ -35,14 +37,14 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 422 - ((28 * winheight(0) + 28) / 57)
+let s:l = 398 - ((18 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 422
+keepjumps 398
 normal! 011|
 tabnext
-edit coc-settings.json
+edit vimrc.vim
 argglobal
 balt ~/Documents/private/darwin/configuration.nix
 setlocal fdm=manual
@@ -55,13 +57,33 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 28) / 57)
+let s:l = 58 - ((16 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
+keepjumps 58
 normal! 0
-tabnext 2
+tabnext
+edit coc-settings.json
+argglobal
+balt vimrc.vim
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 38 - ((18 * winheight(0) + 19) / 38)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 38
+normal! 05|
+tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
