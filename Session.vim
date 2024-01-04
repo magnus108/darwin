@@ -13,57 +13,14 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +398 ~/Documents/private/darwin/configuration.nix
-badd +58 vimrc.vim
+badd +936 ~/Documents/private/darwin/configuration.nix
+badd +55 vimrc.vim
 badd +1 ../../../.omnisharp/omnisharp.json
 badd +38 coc-settings.json
 badd +6 health://
 argglobal
 %argdel
 $argadd ~/Documents/private/darwin/configuration.nix
-tabnew +setlocal\ bufhidden=wipe
-tabnew +setlocal\ bufhidden=wipe
-tabrewind
-edit ~/Documents/private/darwin/configuration.nix
-argglobal
-balt vimrc.vim
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 398 - ((18 * winheight(0) + 19) / 38)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 398
-normal! 011|
-tabnext
-edit vimrc.vim
-argglobal
-balt ~/Documents/private/darwin/configuration.nix
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 58 - ((16 * winheight(0) + 19) / 38)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 58
-normal! 0
-tabnext
 edit coc-settings.json
 argglobal
 balt vimrc.vim
@@ -77,7 +34,7 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 38 - ((18 * winheight(0) + 19) / 38)
+let s:l = 38 - ((34 * winheight(0) + 35) / 70)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt

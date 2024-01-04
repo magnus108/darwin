@@ -320,6 +320,8 @@
 
           # Really?
           # set -ga terminal-overrides ",xterm-kitty:Tc"
+          set-option -sa terminal-features ',xterm-kitty:RGB'
+          set-option -sg escape-time 10
         '';
       };
 
@@ -427,6 +429,7 @@
           nvim-treesitter-parsers.query
           plenary-nvim
           nvim-tree-lua
+          neogit
           gitsigns-nvim
           FixCursorHold-nvim
           noice-nvim
@@ -435,11 +438,15 @@
           bufferline-nvim
           edgy-nvim
           persistence-nvim
-          dashboard-nvim
+          alpha-nvim
           nvim-web-devicons
           nvim-notify
           nui-nvim
           nvim-cursorline
+          hop-nvim
+          aerial-nvim
+          nvim-navic
+          nvim-navbuddy
         ];
 
         extraLuaConfig = ''
@@ -579,12 +586,32 @@
 
                     require("persistence").setup() 
 
+                    local alpha = require('alpha')
+                    local dashboard = require('alpha.themes.dashboard')
 
-                    require('dashboard').setup {
-                      center = {
-                      },
-                      footer = {},
-                    }
+                    -- Define a button for restoring the last session
+                    local restore_last_session = dashboard.button("r", "  Restore Last Session", "<cmd>lua require('persistence').load()<CR>")
+
+                    -- Add the button to the dashboard
+                    table.insert(dashboard.section.buttons.val, restore_last_session)
+
+                    -- Set the dashboard as the startup screen
+                    alpha.setup(dashboard.opts)
+
+
+
+
+                    require("aerial").setup({
+                      -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+                      on_attach = function(bufnr)
+                        -- Jump forwards/backwards with '{' and '}'
+                        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+                        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+                      end,
+                    })
+                    -- You probably also want to set a keymap to toggle aerial
+                    vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
+
 
 
                     require'nvim-web-devicons'.setup {
@@ -769,22 +796,6 @@
                     }
 
 
-                    local gitsigns_bindings = {
-                      ["s"] = {":Gitsigns stage_hunk<CR>", "Stage Hunk"},
-                      ["u"] = {":Gitsigns undo_stage_hunk<CR>", "Undo Stage Hunk"},
-                      ["r"] = {":Gitsigns reset_hunk<CR>", "Reset Hunk"},
-                      ["p"] = {":Gitsigns preview_hunk<CR>", "Preview Hunk"},
-                      ["B"] = {":Gitsigns blame_line<cr>", "Blame line"},
-                      ["b"] = {":Gitsigns toggle_current_line_blame<cr>", "Toggle blame lines"},
-                    }
-
-                    wk.register({
-                      g = {
-                        name = "+gitsigns", -- Optional group name
-                        gitsigns_bindings
-                      }
-                    }, { prefix = "<leader>" })
-
 
 
 
@@ -814,7 +825,6 @@
                     local trouble = require("trouble.providers.telescope")
 
                     local telescope = require("telescope")
-                    local actions = require('telescope.actions')
 
                     -- Setup telescope with more detailed configurations
                     telescope.setup {
@@ -889,28 +899,40 @@
                         -- More pickers can be configured here
                       },
                       extensions = {
-                        "noice"
-                        -- Telescope extensions can be added here
+                        "noice",
+                        aerial = {
+                          -- Display symbols as <root>.<parent>.<symbol>
+                          show_nesting = {
+                            ["_"] = false, -- This key will be the default
+                            json = true, -- You can set the option for specific filetypes
+                            yaml = true,
+                          }
+                        }
                       }
                     }
 
-                    -- Key mappings for telescope
-                    vim.api.nvim_set_keymap('n', '<leader>ff', '<cmd>Telescope find_files<cr>', {noremap = true, silent = true})
-                    vim.api.nvim_set_keymap('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', {noremap = true, silent = true})
-                    vim.api.nvim_set_keymap('n', '<leader>fb', '<cmd>Telescope buffers<cr>', {noremap = true, silent = true})
-                    vim.api.nvim_set_keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>', {noremap = true, silent = true})
 
+                    local telescope_mappings = {
+                      f = {
+                        name = "+Telescope",
+                        f = { "<cmd>Telescope find_files<cr>", "Find File" },
+                        g = { "<cmd>Telescope live_grep<cr>", "Live Grep" },
+                        b = { "<cmd>Telescope buffers<cr>", "Buffers" },
+                        h = { "<cmd>Telescope help_tags<cr>", "Help Tags" },
+                        r = { "<cmd>Telescope oldfiles<cr>", "Recent Files" },
+                        t = { "<cmd>Telescope tags<cr>", "Tags" },
+                        k = { "<cmd>Telescope keymaps<cr>", "Keymaps" },
+                        c = { "<cmd>Telescope commands<cr>", "Commands" },
+                        m = { "<cmd>Telescope marks<cr>", "Marks" },
+                        R = { "<cmd>Telescope registers<cr>", "Registers" },
+                        q = { "<cmd>Telescope quickfix<cr>", "Quickfix" },
+                        l = { "<cmd>Telescope loclist<cr>", "Location List" },
+                        p = { "<cmd>Telescope projects<cr>", "Projects" },
+                        -- Add more mappings here as desired
+                      },
+                    }
 
-
-
-
-
-
-
-
-
-
-
+                    wk.register(telescope_mappings, { prefix = "<leader>" })
 
 
 
@@ -933,6 +955,9 @@
                     vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
                     vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
 
+
+
+
                     -- Use LspAttach autocommand to only map the following keys
                     -- after the language server attaches to the current buffer
                     vim.api.nvim_create_autocmd('LspAttach', {
@@ -943,24 +968,38 @@
 
                         -- Buffer local mappings.
                         -- See `:help vim.lsp.*` for documentation on any of the below functions
-                        local opts = { buffer = ev.buf }
-                        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-                        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-                        vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-                        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-                        vim.keymap.set('n', '<C-i>', vim.lsp.buf.signature_help, opts)
-                        vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-                        vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
-                        vim.keymap.set('n', '<space>wl', function()
-                          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-                        end, opts)
-                        vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-                        vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-                        vim.keymap.set({ 'n', 'v' }, '<space>ci', vim.lsp.buf.code_action, opts)
-                        vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-                        vim.keymap.set('n', '<space>f', function()
-                          vim.lsp.buf.format { async = true }
-                        end, opts)
+                        local opts = { buffer = ev.buf, prefix = "<leader>" }
+
+
+
+
+                        -- THIS IS NOWW CAUSING AN ERROR
+
+                        
+                        local mappings = {
+                          j = {
+                            name = "Go", -- group name
+                            D = {"<cmd>lua vim.lsp.buf.declaration()<CR>", "Go to declaration"},
+                            d = {"<cmd>lua vim.lsp.buf.definition()<CR>", "Go to definition"},
+                            i = {"<cmd>lua vim.lsp.buf.implementation()<CR>", "Go to implementation"},
+                            r = {"<cmd>lua vim.lsp.buf.references()<CR>", "Go to references"},
+                            a = {vim.lsp.buf.code_action, "Code action"},
+                            f = {"<cmd>lua vim.lsp.buf.format { async = true }<CR>", "Format"},
+                            rn = {"<cmd>lua vim.lsp.buf.rename()<CR>", "Rename"},
+                            D = {"<cmd>lua vim.lsp.buf.type_definition()<CR>", "Type definition"},
+                            K = {vim.lsp.buf.hover, "Hover"}
+                          },
+                          ["<C-i>"] = {"<cmd>lua vim.lsp.buf.signature_help()<CR>", "Signature Help"},
+                          ["W"] = {
+                            name = "+workspace/lsp",
+                            wa = {"<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", "Add workspace folder"},
+                            wr = {"<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", "Remove workspace folder"},
+                            wl = {"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", "List workspace folders"},
+                          },
+                        }
+
+
+                        wk.register(mappings, opts)
                       end,
                     })
 
@@ -1293,11 +1332,57 @@
 
 
 
+                    local neogit = require('neogit')
+                    neogit.setup {}
 
 
+                    wk.register({
+                      g = {
+                        name = "Git", -- optional group name
+                        s = { "<cmd>Neogit<cr>", "Open Neogit" },
+                        f = { "<cmd>Telescope git_files<cr>", "Find Git File" },
+                        c = { "<cmd>Telescope git_commits<cr>", "Find Git Commit" },
+                        b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
+                        h = { "<cmd>Telescope git_bcommits<cr>", "Buffer commits" },
+                        S = {":Gitsigns stage_hunk<CR>", "Stage Hunk"},
+                        u = {":Gitsigns undo_stage_hunk<CR>", "Undo Stage Hunk"},
+                        r = {":Gitsigns reset_hunk<CR>", "Reset Hunk"},
+                        p = {":Gitsigns preview_hunk<CR>", "Preview Hunk"},
+                        B = {":Gitsigns blame_line<cr>", "Blame line"},
+                        b = {":Gitsigns toggle_current_line_blame<cr>", "Toggle blame lines"},
+                      },
+                      f = {
+                        name = "File", -- optional group name
+                        f = { "<cmd>Telescope find_files<cr>", "Find File" },
+                        r = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
+                        g = { "<cmd>Telescope live_grep<cr>", "Live Grep" },
+                        -- Add more file related bindings here
+                      },
+                      b = {
+                        name = "Buffer",
+                        b = { "<cmd>Telescope buffers<cr>", "List Buffers" },
+                        n = { "<cmd>bnext<cr>", "Next Buffer" },
+                        p = { "<cmd>bprevious<cr>", "Previous Buffer" },
+                        -- Add more buffer related bindings here
+                      },
+                      -- Add more bindings here
+                      -- ...
+                    }, { mode = "n", prefix = "<leader>" })
+
+
+                    wk.register({
+                      g = {
+                        name = "+gitsigns", -- Optional group name
+                        gitsigns_bindings
+                      }
+                    }, { prefix = "<leader>" })
 
 
                     vim.cmd[[colorscheme tokyonight]]
+
+
+                    -- Should probably color this correctly in init
+                    vim.cmd("highlight DiagnosticUnnecessary guifg=#C792EA")
         '';
 
         #fix
