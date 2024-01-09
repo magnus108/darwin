@@ -23,6 +23,11 @@
       #openlens
       neovim
       feh
+      cmake
+      python310
+      python310Packages.jupyter-core
+      python310Packages.pip
+      virtualenv
       mpv
       graphviz
       ranger
@@ -54,6 +59,12 @@
       # fix
       #qutebrowser-qt5
       omnisharp-roslyn
+      fd
+      tree-sitter
+      tree-sitter-grammars.tree-sitter-bash
+      tree-sitter-grammars.tree-sitter-regex
+      tree-sitter-grammars.tree-sitter-markdown
+      tree-sitter-grammars.tree-sitter-markdown-inline
       tree-sitter-grammars.tree-sitter-query
       tree-sitter-grammars.tree-sitter-c
       tree-sitter-grammars.tree-sitter-c-sharp
@@ -699,21 +710,6 @@
 
 
 
-                    wk.register({
-                        t = {
-                            name = "Testing", -- Optional group name
-                            n = {"<cmd>lua require('neotest').run.run()<CR>", "Run Nearest Test"},
-                            f = {"<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<CR>", "Run Tests In File"},
-                            l = {"<cmd>lua require('neotest').run.run_last()<CR>", "Run Last Test"},
-                            a = {"<cmd>lua require('neotest').run.run({ suite = true})<CR>", "Run All Tests"},
-                            s = {"<cmd>lua require('neotest').summary.toggle()<CR>", "Toggle Summary Panel"},
-                            o = {"<cmd>lua require('neotest').output_panel.toggle()<CR>", "Toggle Output Panel"},
-                            w = {"<cmd>lua require('neotest').run.watch()<CR>", "Watch Test"},
-                        },
-                    }, { prefix = "<leader>" })
-
-
-
 
 
 
@@ -928,6 +924,9 @@
                         q = { "<cmd>Telescope quickfix<cr>", "Quickfix" },
                         l = { "<cmd>Telescope loclist<cr>", "Location List" },
                         p = { "<cmd>Telescope projects<cr>", "Projects" },
+                        e = { "<cmd>Telescope env<cr>", "Environment Variables" },
+                        j = { "<cmd>Telescope jumplist<cr>", "Jumplist" },
+                        o = { "<cmd>Telescope diagnostics<cr>", "LSP Diagnostics" },
                         -- Add more mappings here as desired
                       },
                     }
@@ -947,13 +946,6 @@
                       },
                     }
 
-
-                    -- Global mappings.
-                    -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-                    vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
-                    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-                    vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-                    vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
 
 
 
@@ -1250,10 +1242,10 @@
 
                     require'nvim-treesitter.configs'.setup {
 
-                      --parser_install_dir = "/Users/magnus/Documents/private/parser",
+                      parser_install_dir = "/Users/magnus/Documents/private/parser",
 
                       -- A list of parser names, or "all" (the five listed parsers should always be installed)
-                      -- ensure_installed = { "haskell", "c_sharp", "c", "lua", "vim", "vimdoc", "query" },
+                      ensure_installed = { "haskell", "c_sharp", "c", "lua", "vim", "vimdoc", "query" },
 
                       -- Install parsers synchronously (only applied to `ensure_installed`)
                       sync_install = false,
@@ -1297,10 +1289,14 @@
 
 
 
+                    local neotest = require("neotest")
 
 
 
-                    require("neotest").setup({
+                    neotest.setup({
+                      output = {
+                          open_on_run = false,
+                      },
                       adapters = {
                         require('neotest-haskell'),
                         require("neotest-dotnet")({
@@ -1315,9 +1311,10 @@
                                 mstest = { "MyCustomTestMethodAttribute" }
                               },
                               -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
-                              dotnet_additional_args = {
-                                "--verbosity detailed"
-                              },
+                              --dotnet_additional_args = {
+                               -- "--verbosity detailed"
+                                -- "--results-directory "
+                              --},
                               -- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
                               -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
                               --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
@@ -1329,6 +1326,23 @@
                           -- You can customize other aspects of diagnostics here
                         },
                     })
+
+
+                    wk.register({
+                        t = {
+                            name = "Testing", -- Optional group name
+                            n = {"<cmd>lua require('neotest').run.run()<CR>", "Run Nearest Test"},
+                            f = {"<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<CR>", "Run Tests In File"},
+                            l = {"<cmd>lua require('neotest').run.run_last()<CR>", "Run Last Test"},
+                            a = {"<cmd>lua require('neotest').run.run({ suite = true})<CR>", "Run All Tests"},
+                            s = {"<cmd>lua require('neotest').summary.toggle()<CR>", "Toggle Summary Panel"},
+                            o = {"<cmd>lua require('neotest').output_panel.toggle()<CR>", "Toggle Output Panel"},
+                            w = {"<cmd>lua require('neotest').run.watch()<CR>", "Watch Test"},
+                        },
+                    }, { prefix = "<leader>" })
+
+
+
 
 
 
