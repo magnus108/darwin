@@ -10,7 +10,8 @@ set autoread
 set background=dark
 set colorcolumn=80
 set backspace=indent,eol,start
-set completeopt=menuone,longest,preview
+"set completeopt=menuone,longest,preview
+set completeopt=longest
 set confirm
 set copyindent
 set history=5000
