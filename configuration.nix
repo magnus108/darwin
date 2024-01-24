@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs,  ... }:
 
 {
   nix.settings = {
@@ -32,6 +32,7 @@
       graphviz
       ranger
       ripgrep
+      ilspycmd
       dotnet-sdk_8
       highlight
       mono
@@ -228,7 +229,7 @@
     };
   };
 
-  home-manager.users.magnus = { lib, pkgs, ... }: {
+  home-manager.users.magnus = { lib, pkgs, fetchFromGitHub,... }: {
     home = { stateVersion = "22.05"; };
     home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
       ''
@@ -447,9 +448,6 @@
           todo-comments-nvim
           trouble-nvim
           bufferline-nvim
-          edgy-nvim
-          persistence-nvim
-          alpha-nvim
           nvim-web-devicons
           nvim-notify
           nui-nvim
@@ -459,12 +457,40 @@
           nvim-navic
           nvim-navbuddy
           iron-nvim
+          auto-session
+          hardtime-nvim
+          (pkgs.vimUtils.buildVimPlugin {
+                  pname = "diagflow.nvim";
+                  version = "0.1.0"; # Replace with the specific version
+
+                  src = pkgs.fetchFromGitHub {
+                    owner = "dgagn";
+                    repo = "diagflow.nvim";
+                    rev = "6882a91ec0473fbc4a04881c9bf7eaeb08185cac";
+                    sha256 = "12fqlcrs1c4nx29bmchda6rdhxgawhrq072ksf9rd67ff6kzvv8j";
+                  };
+
+                  installPhase = ''
+                    mkdir -p $out/share/nvim/site/pack/plugins/start/diagflow
+                    cp -R * $out/share/nvim/site/pack/plugins/start/diagflow
+                  '';
+
+                  meta = with pkgs.lib; {
+                    description = "DiagFlow - Neovim plugin for managing diagnostics";
+                    homepage = "https://github.com/dgagn/diagflow.nvim";
+                    license = pkgs.lib.licenses.mit;
+                    maintainers = with pkgs.lib.maintainers; [ ]; # Add maintainers here
+                  };
+                })
         ];
 
         extraLuaConfig = ''
           -- disable netrw at the very start of your init.lua
           vim.g.loaded_netrw = 1
           vim.g.loaded_netrwPlugin = 1
+
+
+          require('diagflow').setup()
 
           require'hop'.setup()
           local hop = require('hop')
@@ -482,6 +508,7 @@
             hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
           end, {remap=true})
 
+          require("hardtime").setup()
 
           require('nvim-cursorline').setup {
             cursorline = {
@@ -498,7 +525,8 @@
 
           vim.notify = require("notify")
 
-          require("bufferline").setup{}
+          require("bufferline").setup()
+
 
           require("noice").setup({
             lsp = {
@@ -611,20 +639,6 @@
               },
           }
 
-          require("persistence").setup() 
-
-          local alpha = require('alpha')
-          local dashboard = require('alpha.themes.dashboard')
-
-          -- Define a button for restoring the last session
-          local restore_last_session = dashboard.button("r", "  Restore Last Session", "<cmd>lua require('persistence').load()<CR>")
-
-          -- Add the button to the dashboard
-          table.insert(dashboard.section.buttons.val, restore_last_session)
-
-          -- Set the dashboard as the startup screen
-          alpha.setup(dashboard.opts)
-
 
 
 
@@ -639,13 +653,9 @@
             open_automatic = true,
             on_attach = function(bufnr)
               wk.register({
-                  a = {
-                      name = "aerial", -- group name
-                      n = { "<cmd>AerialNext<CR>zz", "Next Symbol" },
-                      p = { "<cmd>AerialPrev<CR>zz", "Previous Symbol" },
-                      t = { "<cmd>AerialToggle<CR>", "Toggle Aerial" },
-                  },
-              }, { prefix = "<leader>" })
+                  J = { "<cmd>AerialNext<CR>zz", "Next Symbol" },
+                  K = { "<cmd>AerialPrev<CR>zz", "Previous Symbol" },
+              })
             end,
           })
 
@@ -697,15 +707,6 @@
 
 
 
-
-          wk.register({
-            q = {
-              name = "+persistence",  -- Group name for persistence actions
-              s = { "<cmd>lua require('persistence').load()<cr>", "Restore Session" },
-              l = { "<cmd>lua require('persistence').load({ last = true })<cr>", "Restore Last Session" },
-              d = { "<cmd>lua require('persistence').stop()<cr>", "Stop Persistence" },
-            },
-          }, { mode = "n", prefix = "<leader>" })
 
 
 
@@ -992,6 +993,7 @@
               -- More pickers can be configured here
             },
             extensions = {
+              "session-lens",
               "noice",
               aerial = {
                 -- Display symbols as <root>.<parent>.<symbol>
@@ -1024,6 +1026,7 @@
               e = { "<cmd>Telescope env<cr>", "Environment Variables" },
               j = { "<cmd>Telescope jumplist<cr>", "Jumplist" },
               o = { "<cmd>Telescope diagnostics<cr>", "LSP Diagnostics" },
+              s = { require('auto-session.session-lens').search_session, "Auto Session"},
             },
           }
 
@@ -1127,6 +1130,7 @@
               ['<C-Space>'] = cmp.mapping.complete(),
               ['<C-e>'] = cmp.mapping.abort(),
               ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+              ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
             }),
             sources = cmp.config.sources({
               { name = 'nvim_lsp' },
@@ -1434,7 +1438,7 @@
 
           wk.register({
               t = {
-                  name = "Testing", -- Optional group name
+                  name = "Testing",
                   n = {"<cmd>lua require('neotest').run.run()<CR>", "Run Nearest Test"},
                   f = {"<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<CR>", "Run Tests In File"},
                   l = {"<cmd>lua require('neotest').run.run_last()<CR>", "Run Last Test"},
@@ -1472,19 +1476,47 @@
               B = {":Gitsigns blame_line<cr>", "Blame line"},
               b = {":Gitsigns toggle_current_line_blame<cr>", "Toggle blame lines"},
             },
-            f = {
-              name = "File",
-              f = { "<cmd>Telescope find_files<cr>", "Find File" },
-              r = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
-              g = { "<cmd>Telescope live_grep<cr>", "Live Grep" },
-            },
-            b = {
-              name = "Buffer",
-              b = { "<cmd>Telescope buffers<cr>", "List Buffers" },
-              n = { "<cmd>bnext<cr>", "Next Buffer" },
-              p = { "<cmd>bprevious<cr>", "Previous Buffer" },
-            },
           }, { mode = "n", prefix = "<leader>" })
+
+
+
+
+          vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
+          --local function restore_nvim_tree()
+        --  local nvim_tree = require('nvim-tree')
+      --    nvim_tree.change_dir(vim.fn.getcwd())
+    --      nvim_tree.refresh()
+  --     end
+
+
+          local opts = {
+--        post_restore_cmds = {restore_nvim_tree},
+            log_level = 'info',
+            auto_session_enable_last_session = false,
+            auto_session_root_dir = vim.fn.stdpath('data').."/sessions/",
+            auto_session_enabled = true,
+            auto_save_enabled = nil,
+            auto_restore_enabled = nil,
+            auto_session_suppress_dirs = nil,
+            auto_session_use_git_branch = nil,
+            -- the configs below are lua only
+            bypass_session_save_file_types = nil
+          }
+
+          require('auto-session').setup(opts)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
