@@ -60,3 +60,5 @@ autocmd CursorMoved * normal zz
 let g:tmux_navigator_no_mappings = 1
 
 let g:cursorhold_updatetime = 100
+
+let g:auto_session_pre_save_cmds = ["tabdo NERDTreeClose"]

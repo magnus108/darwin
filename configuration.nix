@@ -459,6 +459,8 @@
           iron-nvim
           auto-session
           hardtime-nvim
+          lualine-nvim
+          lualine-lsp-progress
           (pkgs.vimUtils.buildVimPlugin {
                   pname = "diagflow.nvim";
                   version = "0.1.0"; # Replace with the specific version
@@ -491,6 +493,16 @@
 
 
           require('diagflow').setup()
+
+
+          require('lualine').setup({
+            sections = {
+		            lualine_c = {
+			            'lsp_progress'
+		            }
+	            }
+          })
+          
 
           require'hop'.setup()
           local hop = require('hop')
@@ -525,7 +537,8 @@
 
           vim.notify = require("notify")
 
-          require("bufferline").setup()
+          -- BUFFFERS
+--          require("bufferline").setup()
 
 
           require("noice").setup({
@@ -645,12 +658,22 @@
 
 
 
+          wk.register({
+              w = {
+                  name = "+hop",  -- Group name
+                  w = {"<cmd>lua require'hop'.hint_words()<cr>", "Jump to Word"},
+                  c = {"<cmd>lua require'hop'.hint_char2()<cr>", "Jump to 2 Chars"},
+                  l = {"<cmd>lua require'hop'.hint_lines()<cr>", "Jump to Line"},
+                  p = {"<cmd>lua require'hop'.hint_patterns()<cr>", "Jump to Pattern"},
+              }
+          }, {prefix = "<leader>"})  -- Assuming your leader key is set to " "
+
 
 
 
 
           require("aerial").setup({
-            open_automatic = true,
+            --open_automatic = true,
             on_attach = function(bufnr)
               wk.register({
                   J = { "<cmd>AerialNext<CR>zz", "Next Symbol" },
@@ -658,6 +681,7 @@
               })
             end,
           })
+          vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
 
 
 
@@ -887,7 +911,9 @@
 
 
 
-          require("nvim-tree").setup({
+          local nvim_tree = require("nvim-tree")
+
+          nvim_tree.setup({
             sort = {
               sorter = "case_sensitive",
             },
@@ -1483,15 +1509,14 @@
 
           vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
-          --local function restore_nvim_tree()
-        --  local nvim_tree = require('nvim-tree')
-      --    nvim_tree.change_dir(vim.fn.getcwd())
-    --      nvim_tree.refresh()
-  --     end
+          --function restore_nvim_tree()
+           -- nvim_tree.change_dir(vim.fn.getcwd())
+            --nvim_tree.refresh()
+          --end
 
 
           local opts = {
---        post_restore_cmds = {restore_nvim_tree},
+           -- pre_restore_cmds = {restore_nvim_tree},
             log_level = 'info',
             auto_session_enable_last_session = false,
             auto_session_root_dir = vim.fn.stdpath('data').."/sessions/",
