@@ -28,7 +28,7 @@
       python310Packages.jupyter-core
       python310Packages.pip
       virtualenv
-      mpv
+      #mpv
       graphviz
       ranger
       ripgrep
@@ -249,10 +249,10 @@
       noti.enable = true;
       navi.enable = true;
 
-      #qutebrowser = {
-      #  enable = true;
-      #  package = pkgs.qutebrowser-qt5;
-      #};
+     # qutebrowser = {
+     #   enable = true;
+     #   package = pkgs.qutebrowser-qt5;
+     # };
 
       kitty = {
         enable = true;
@@ -413,7 +413,7 @@
           vim-tmux-navigator
           vim-nix
           telescope-nvim
-          coc-nvim
+          #coc-nvim
           nvim-lspconfig
           omnisharp-extended-lsp-nvim
           cmp-nvim-lsp
