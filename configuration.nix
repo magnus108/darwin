@@ -24,9 +24,9 @@
       neovim
       feh
       cmake
-      python310
-      python310Packages.jupyter-core
-      python310Packages.pip
+      #python310
+      #python310Packages.jupyter-core
+      #python310Packages.pip
       virtualenv
       #mpv
       graphviz
@@ -36,6 +36,7 @@
       dotnet-sdk_8
       highlight
       mono
+      prettierd
       fzf
       git
       zip
@@ -408,6 +409,7 @@
         withPython3 = true;
         #withRuby = true;
         plugins = with pkgs.vimPlugins; [
+          formatter-nvim
           which-key-nvim
           ranger-vim
           vim-tmux-navigator
@@ -502,6 +504,27 @@
 		            }
 	            }
           })
+
+          require('formatter').setup({
+            filetype = {
+              javascript = {
+                function()
+                  return {
+                    exe = "prettier",
+                    args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), '--single-quote'},
+                    stdin = true
+                  }
+                end
+              }
+            }
+          })
+
+          vim.api.nvim_exec([[
+            augroup FormatAutogroup
+              autocmd!
+              autocmd BufWritePost *.js silent! FormatWrite
+            augroup END
+          ]], true)
           
 
           require'hop'.setup()
@@ -1572,7 +1595,9 @@
         syntaxHighlighting = {
           enable = true;
         };
-        enableAutosuggestions = true;
+        autosuggestion = {
+          enable = true;
+        };
         oh-my-zsh = {
           enable = true;
           theme = "ys";
