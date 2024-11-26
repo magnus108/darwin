@@ -45,7 +45,7 @@
       tig
       gh
       nodejs_20
-      dbeaver
+      dbeaver-bin
       docker
       jetbrains.rider
       netcoredbg
@@ -57,6 +57,7 @@
       nixpkgs-fmt
       nil
       nodePackages.vscode-json-languageserver
+      nodePackages.typescript-language-server
       kitty
       # fix
       #qutebrowser-qt5
@@ -73,19 +74,22 @@
       tree-sitter-grammars.tree-sitter-query
       tree-sitter-grammars.tree-sitter-haskell
       tree-sitter-grammars.tree-sitter-lua
-    ];
-  };
-
-  nixpkgs.config = { allowUnfree = true; };
-
-  fonts = {
-    fontDir.enable = true;
-    fonts = with pkgs; [
       source-code-pro
       font-awesome
       (nerdfonts.override { fonts = [ "FiraCode" ]; })
     ];
   };
+
+  nixpkgs.config = { allowUnfree = true; };
+
+  #fonts = {
+    #fontconfig.enable = true;
+    #fonts = with pkgs; [
+    #  source-code-pro
+    #  font-awesome
+    #  (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    #];
+  #};
 
   system = {
     stateVersion = 4;
@@ -231,7 +235,7 @@
   };
 
   home-manager.users.magnus = { lib, pkgs, fetchFromGitHub,... }: {
-    home = { stateVersion = "22.05"; };
+    home = { stateVersion = "24.11"; };
     home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
       ''
         ln -sfn $HOME/Documents/private/darwin/.tigrc $HOME/.tigrc
