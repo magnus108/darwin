@@ -21,6 +21,7 @@
 
     systemPackages = with pkgs; [
       #openlens
+#      fontconfig
       neovim
       feh
       cmake
@@ -31,11 +32,15 @@
       #mpv
       graphviz
       ranger
+      pandoc
       ripgrep
-      ilspycmd
-      dotnet-sdk_8
+      #ilspycmd
+      texliveFull
+      #dejavu_fonts
+#      texlivePackages.dejavu
+      dotnet-sdk_9
       highlight
-      mono
+      #mono
       prettierd
       fzf
       git
@@ -52,7 +57,7 @@
       #jetbrains.webstorm
       vscode
       zsh
-      telepresence2
+      #telepresence2
       kubectl
       nixpkgs-fmt
       nil
@@ -61,7 +66,7 @@
       kitty
       # fix
       #qutebrowser-qt5
-      omnisharp-roslyn
+      #omnisharp-roslyn
       fd
       tree-sitter
       tree-sitter-grammars.tree-sitter-bash
@@ -69,30 +74,31 @@
       tree-sitter-grammars.tree-sitter-markdown
       tree-sitter-grammars.tree-sitter-markdown-inline
       tree-sitter-grammars.tree-sitter-query
-      tree-sitter-grammars.tree-sitter-c
-      tree-sitter-grammars.tree-sitter-c-sharp
+      #tree-sitter-grammars.tree-sitter-c
+      #tree-sitter-grammars.tree-sitter-c-sharp
       tree-sitter-grammars.tree-sitter-query
       tree-sitter-grammars.tree-sitter-haskell
       tree-sitter-grammars.tree-sitter-lua
       source-code-pro
       font-awesome
-      (nerdfonts.override { fonts = [ "FiraCode" ]; })
+      fira-code
+     #(nerdfonts.override { fonts = [ "FiraCode" ]; })
     ];
   };
 
   nixpkgs.config = { allowUnfree = true; };
 
   #fonts = {
-    #fontconfig.enable = true;
-    #fonts = with pkgs; [
-    #  source-code-pro
-    #  font-awesome
-    #  (nerdfonts.override { fonts = [ "FiraCode" ]; })
-    #];
+  #  fontconfig.enable = true;
+  #  fonts = with pkgs; [
+  #    source-code-pro
+  #    font-awesome
+  #    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+  #  ];
   #};
 
   system = {
-    stateVersion = 4;
+    stateVersion = 5;
     defaults = {
       NSGlobalDomain = {
         KeyRepeat = 1;
@@ -235,11 +241,25 @@
   };
 
   home-manager.users.magnus = { lib, pkgs, fetchFromGitHub,... }: {
-    home = { stateVersion = "24.11"; };
+    home = { stateVersion = "25.05"; };
     home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ]
       ''
         ln -sfn $HOME/Documents/private/darwin/.tigrc $HOME/.tigrc
       '';
+
+    fonts = {
+      fontconfig.enable = true;
+      #fonts = with pkgs; [
+      #  source-code-pro
+      #  font-awesome
+      #  fira-code
+       #(nerdfonts.override { fonts = [ "FiraCode" ]; })
+      #];
+    };
+    fonts.fontconfig.defaultFonts = {
+      monospace = [ "FiraCode Nerd Font Mono" ];
+    };
+
 
     programs = {
       #gh = {
@@ -261,7 +281,7 @@
 
       kitty = {
         enable = true;
-        theme = "Tokyo Night";
+        themeFile = "tokyo_night_night";
         darwinLaunchOptions = [ "--single-instance" "--directory=~" ];
         settings = {
           enable_audio_bell = false;
@@ -270,10 +290,10 @@
           confirm_os_window_close = 0;
           #clear_all_mouse_actions = "yes";
           #clear_all_shortcuts = "yes";
-          mouse_hide_wait = 3;
+          #mouse_hide_wait = 3;
         };
         font.size = 11;
-        font.name = "FiraCode Nerd Font Bold";
+        font.name = "FiraCode Nerd Font Mono";
         extraConfig = ''
           map cmd+c        copy_to_clipboard
           map cmd+v        paste_from_clipboard
@@ -301,7 +321,7 @@
               set -g @resurrect-capture-pane-contents 'on'
             '';
           }
-          {
+          { 
             plugin = continuum;
             extraConfig = ''
               set -g @continuum-boot 'on'
@@ -339,6 +359,8 @@
           # set -ga terminal-overrides ",xterm-kitty:Tc"
           set-option -sa terminal-features ',xterm-kitty:RGB'
           set-option -sg escape-time 10
+
+          set-option -g focus-events on
         '';
       };
 
@@ -421,7 +443,7 @@
           telescope-nvim
           #coc-nvim
           nvim-lspconfig
-          omnisharp-extended-lsp-nvim
+          #omnisharp-extended-lsp-nvim
           cmp-nvim-lsp
           cmp-nvim-lsp-signature-help
           cmp-buffer
@@ -434,7 +456,7 @@
           nvim-dap
           nvim-dap-ui
           neotest
-          neotest-dotnet
+#          neotest-dotnet
           neotest-haskell
           haskell-tools-nvim
           nvim-treesitter
@@ -1234,21 +1256,21 @@
 
           local pid = vim.fn.getpid()
           -- On linux/darwin if using a release build, otherwise under scripts/OmniSharp(.Core)(.cmd)
-          local omnisharp_bin = "/run/current-system/sw/bin/OmniSharp"
+          -- local omnisharp_bin = "/run/current-system/sw/bin/OmniSharp"
           -- on Windows
           -- local omnisharp_bin = "/run/current-system/sw/bin/OmniSharp"
 
-          local config = {
-            handlers = {
-              ["textDocument/definition"] = require('omnisharp_extended').handler,
-            },
-            cmd = { omnisharp_bin, '--languageserver' , '--hostPID', tostring(pid) },
+          -- local config = {
+            --handlers = {
+             -- ["textDocument/definition"] = require('omnisharp_extended').handler,
+            --},
+            -- cmd = { omnisharp_bin, '--languageserver' , '--hostPID', tostring(pid) },
             -- rest of your settings
-            capabilities = capabilities,
+            -- capabilities = capabilities,
 
             -- Enables support for reading code style, naming convention and analyzer
             -- settings from .editorconfig.
-            enable_editorconfig_support = true,
+            -- enable_editorconfig_support = true,
 
             -- If true, MSBuild project system will only load projects for files that
             -- were opened in the editor. This setting is useful for big C# codebases
@@ -1256,14 +1278,14 @@
             -- for projects that are relevant to code that is being edited. With this
             -- setting enabled OmniSharp may load fewer projects and may thus display
             -- incomplete reference lists for symbols.
-            enable_ms_build_load_projects_on_demand = false,
+            -- enable_ms_build_load_projects_on_demand = false,
 
             -- Enables support for roslyn analyzers, code fixes and rulesets.
-            enable_roslyn_analyzers = true,
+            -- enable_roslyn_analyzers = true,
 
             -- Specifies whether 'using' directives should be grouped and sorted during
             -- document formatting.
-            organize_imports_on_format = true,
+            -- organize_imports_on_format = true,
 
             -- Enables support for showing unimported types and unimported extension
             -- methods in completion lists. When committed, the appropriate using
@@ -1271,18 +1293,18 @@
             -- have a negative impact on initial completion responsiveness,
             -- particularly for the first few completion sessions after opening a
             -- solution.
-            enable_import_completion = true,
+            -- enable_import_completion = true,
 
             -- Specifies whether to include preview versions of the .NET SDK when
             -- determining which version to use for project loading.
-            sdk_include_prereleases = true,
+            --sdk_include_prereleases = true,
 
             -- Only run analyzers against open files when 'enableRoslynAnalyzers' is
             -- true
-            analyze_open_documents_only = false,
-          }
+           -- analyze_open_documents_only = false,
+          --}
 
-          lspconfig.omnisharp.setup(config)
+          --lspconfig.omnisharp.setup(config)
 
 
 
@@ -1460,27 +1482,27 @@
             },
             adapters = {
               require('neotest-haskell'),
-              require("neotest-dotnet")({
-                    -- Extra arguments for nvim-dap configuration
-                    -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
-                    dap = { justMyCode = false },
-                    -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
-                    -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
-                    custom_attributes = {
-                      xunit = { "MyCustomFactAttribute" },
-                      nunit = { "MyCustomTestAttribute" },
-                      mstest = { "MyCustomTestMethodAttribute" }
-                    },
-                    -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
-                    dotnet_additional_args = {
-                      "--verbosity quiet"
-                      -- "--results-directory "
-                    },
-                    -- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
-                    -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
-                    --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
-                    discovery_root = "solution" -- Default
-                  })
+              -- #require("neotest-dotnet")({
+                --    -- Extra arguments for nvim-dap configuration
+                 --   -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
+                  --  dap = { justMyCode = false },
+                  --- -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
+                    -- -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
+                    -- custom_attributes = {
+                     -- xunit = { "MyCustomFactAttribute" },
+                      -- nunit = { "MyCustomTestAttribute" },
+                      -- mstest = { "MyCustomTestMethodAttribute" }
+                    -- },
+                    -- -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
+                   -- dotnet_additional_args = {
+                    --  "--verbosity quiet"
+                     -- -- "--results-directory "
+                   -- },
+                    ---- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
+                    ---- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
+                    ----       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
+                    --discovery_root = "solution" -- Default
+                  --})
             },
             diagnostics = {
                 enabled = true,  -- Ensure diagnostics are enabled
