@@ -4,6 +4,7 @@
   nix.settings = {
     substituters = [ "https://cache.iog.io" ];
     trusted-public-keys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" ];
+    experimental-features = [ "nix-command" "flakes" ];
   };
 
   users.users.magnus = {
@@ -22,6 +23,7 @@
     systemPackages = with pkgs; [
       #openlens
 #      fontconfig
+      htop
       neovim
       feh
       cmake
@@ -49,7 +51,7 @@
       unzip
       tig
       gh
-      nodejs_20
+      nodejs_24
       dbeaver-bin
       docker
       jetbrains.rider
@@ -476,8 +478,10 @@
           todo-comments-nvim
           trouble-nvim
           bufferline-nvim
+          nvim-cokeline
           nvim-web-devicons
           nvim-notify
+          telescope-ui-select-nvim
           nui-nvim
           nvim-cursorline
           hop-nvim
@@ -489,29 +493,29 @@
           hardtime-nvim
           lualine-nvim
           lualine-lsp-progress
-          (pkgs.vimUtils.buildVimPlugin {
-                  pname = "diagflow.nvim";
-                  version = "0.1.0"; # Replace with the specific version
-
-                  src = pkgs.fetchFromGitHub {
-                    owner = "dgagn";
-                    repo = "diagflow.nvim";
-                    rev = "6882a91ec0473fbc4a04881c9bf7eaeb08185cac";
-                    sha256 = "12fqlcrs1c4nx29bmchda6rdhxgawhrq072ksf9rd67ff6kzvv8j";
-                  };
-
-                  installPhase = ''
-                    mkdir -p $out/share/nvim/site/pack/plugins/start/diagflow
-                    cp -R * $out/share/nvim/site/pack/plugins/start/diagflow
-                  '';
-
-                  meta = with pkgs.lib; {
-                    description = "DiagFlow - Neovim plugin for managing diagnostics";
-                    homepage = "https://github.com/dgagn/diagflow.nvim";
-                    license = pkgs.lib.licenses.mit;
-                    maintainers = with pkgs.lib.maintainers; [ ]; # Add maintainers here
-                  };
-                })
+          #(pkgs.vimUtils.buildVimPlugin {
+          #        pname = "diagflow.nvim";
+          #        version = "0.1.0"; # Replace with the specific version
+          #
+          #        src = pkgs.fetchFromGitHub {
+          #          owner = "dgagn";
+          #          repo = "diagflow.nvim";
+          #          rev = "6882a91ec0473fbc4a04881c9bf7eaeb08185cac";
+          #          sha256 = "12fqlcrs1c4nx29bmchda6rdhxgawhrq072ksf9rd67ff6kzvv8j";
+          #        };
+          #
+          #        installPhase = ''
+          #          mkdir -p $out/share/nvim/site/pack/plugins/start/diagflow
+          #          cp -R * $out/share/nvim/site/pack/plugins/start/diagflow
+          #        '';
+          #
+          #        meta = with pkgs.lib; {
+          #          description = "DiagFlow - Neovim plugin for managing diagnostics";
+          #          homepage = "https://github.com/dgagn/diagflow.nvim";
+          #          license = pkgs.lib.licenses.mit;
+          #          maintainers = with pkgs.lib.maintainers; [ ]; # Add maintainers here
+          #        };
+          #      })
         ];
 
         extraLuaConfig = ''
@@ -520,7 +524,7 @@
           vim.g.loaded_netrwPlugin = 1
 
 
-          require('diagflow').setup()
+--          require('diagflow').setup()
 
 
           require('lualine').setup({
@@ -588,6 +592,7 @@
 
           -- BUFFFERS
 --          require("bufferline").setup()
+          require('cokeline').setup()
 
 
           require("noice").setup({
@@ -597,6 +602,7 @@
                 ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
                 ["vim.lsp.util.stylize_markdown"] = true,
                 ["cmp.entry.get_documentation"] = true,
+                ["vim.ui.select"] = false,
               },
             },
             -- you can enable a preset for easier configuration
@@ -672,8 +678,11 @@
               hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "^:", "^ ", "^call ", "^lua " }, -- hide mapping boilerplate
               show_help = true, -- show a help message in the command line for using WhichKey
               show_keys = true, -- show the currently pressed key and its label as a message in the command line
-              triggers = "auto", -- automatically setup triggers
+              -- triggers = "auto", -- automatically setup triggers
               -- triggers = {"<leader>"} -- or specifiy a list manually
+              triggers = {
+                { "<leader>", mode = { "n", "v" } },
+              },
               -- list of triggers, where WhichKey should not wait for timeoutlen and show immediately
               triggers_nowait = {
                 -- marks
@@ -720,17 +729,6 @@
 
 
 
-
-          require("aerial").setup({
-            --open_automatic = true,
-            on_attach = function(bufnr)
-              wk.register({
-                  J = { "<cmd>AerialNext<CR>zz", "Next Symbol" },
-                  K = { "<cmd>AerialPrev<CR>zz", "Previous Symbol" },
-              })
-            end,
-          })
-          vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
 
 
 
@@ -784,11 +782,32 @@
 
 
 
-
-
-
-
           local ht = require('haskell-tools')
+
+          vim.g.haskell_tools = {
+            hls = {
+              on_attach = function(client, bufnr, ht)
+                -- 1. Remove the default 'K' hover binding
+                vim.keymap.del('n', 'K', { buffer = bufnr })
+
+                -- 2. Assign hover to <C-k> (or your preferred key)
+                -- vim.keymap.set('n', '<C-k>', ht.hover_actions.hover_definition, {
+                  --buffer = bufnr,
+                  -- desc = 'Haskell Hover',
+                --})
+
+                -- 3. (Optional) Add other LSP keybindings here
+                -- Example: Code actions on <leader>ca
+                --vim.keymap.set('n', '<leader>ca', ht.lsp.buf.code_action, {
+                 -- buffer = bufnr,
+                  --desc = 'Haskell Code Action',
+                --})
+              end,
+            },
+          }
+
+
+
 
 
           local mappings = {
@@ -1030,6 +1049,7 @@
                     ["<C-k>"] = actions.move_selection_previous,   -- Move selection up
                     ["<C-n>"] = actions.cycle_history_next,        -- Next history item
                     ["<C-p>"] = actions.cycle_history_prev,        -- Previous history item
+                    ["<C-h>"] = "which_key",
                     ["<esc>"] = actions.close,                     -- Close the popup
                     -- ["<c-t>"] = trouble.open_with_trouble 
                     -- Additional insert mode mappings
@@ -1046,31 +1066,94 @@
             pickers = {
               -- Configure specific pickers
               find_files = {
-                theme = "dropdown",
-                previewer = false,
+                sort_mru = true,
+                ignore_current_buffer = true,
+                only_cwd = true,
+                theme = "ivy",
+                previewer = true,
+                -- layout_strategy = 'vertical',
+                -- layout_config = {
+                  -- width = 0.8,
+                  -- height = 0.8,
+                  -- prompt_position = 'top',
+                -- },
               },
               live_grep = {
                 theme = "ivy",
               },
+              diagnostics = {
+                    show_line = true,
+                    previewer = true,
+                    theme = "ivy",
+                    layout_strategy = "vertical",
+                    -- layout_config = {
+                    -- #  width = 0.9,
+                    -- #  height = 0.9,
+                    -- #  preview_cutoff = 20,
+                    -- #  prompt_position = "top",
+                    -- #},
+                    mappings = {
+                      i = {
+                        ["<C-j>"] = "move_selection_next",
+                        ["<C-k>"] = "move_selection_previous",
+                      },
+                      n = {
+                        ["j"] = "move_selection_next",
+                        ["k"] = "move_selection_previous",
+                      },
+                    },
+                  },
+
+              tags = {
+                    show_line = true,
+                    previewer = true,
+                    theme = "ivy",
+                    layout_strategy = "horizontal",
+                    -- layout_config = {
+                    -- #  width = 0.9,
+                    -- #  height = 0.9,
+                    -- #  preview_cutoff = 20,
+                    -- #  prompt_position = "top",
+                    -- #},
+                    mappings = {
+                      i = {
+                        ["<C-j>"] = "move_selection_next",
+                        ["<C-k>"] = "move_selection_previous",
+                      },
+                      n = {
+                        ["j"] = "move_selection_next",
+                        ["k"] = "move_selection_previous",
+                      },
+                    },
+                  },
               buffers = {
-                sort_lastused = true,
-                theme = "dropdown",
-                previewer = false,
+                sort_mru = true,
+                ignore_current_buffer = true,
+                only_cwd = true,
+                theme = "ivy",
+                previewer = true,
+                -- layout_strategy = 'vertical',
+                -- layout_config = {
+                  -- width = 0.8,
+                  -- height = 0.8,
+                  -- prompt_position = 'top',
+                -- },
+                sorting_strategy = 'ascending',
                 mappings = {
                   i = {
-                    ["<c-d>"] = "delete_buffer",
+                    ["<C-d>"] = require('telescope.actions').delete_buffer,
                   },
                   n = {
-                    ["<c-d>"] = "delete_buffer",
+                    ["<C-d>"] = require('telescope.actions').delete_buffer,
                   },
-                },
+                }
               },
-              -- More pickers can be configured here
             },
             extensions = {
               "session-lens",
               "noice",
               "notify",
+              "ui-select",
               aerial = {
                 -- Display symbols as <root>.<parent>.<symbol>
                 show_nesting = {
@@ -1082,6 +1165,11 @@
             }
           }
 
+          telescope.load_extension("ui-select")
+          telescope.load_extension("session-lens")
+          telescope.load_extension("noice")
+          telescope.load_extension("notify")
+          telescope.load_extension("ui-select")
 
           local telescope_mappings = {
             f = {
@@ -1148,8 +1236,9 @@
                   r = {"<cmd>Telescope lsp_references<CR>", "Go to references"},
                   s = {"<cmd>Telescope lsp_document_symbols<CR>", "Go to document symbols"},
 
+                  l = { function() vim.diagnostic.open_float() end, "Line Diagnostics" },
                   a = {vim.lsp.buf.code_action, "Code action"},
-                  f = {"<cmd>lua vim.lsp.buf.format { async = true }<CR>", "Format"},
+                  e = {"<cmd>lua vim.lsp.buf.format { async = true }<CR>", "Format"},
                   z = {"<cmd>lua vim.lsp.buf.rename()<CR>", "Rename"},
                   k = {vim.lsp.buf.hover, "Hover"},
                   f = {"<cmd>lua vim.lsp.buf.signature_help()<CR>", "Signature Help"},
@@ -1506,9 +1595,23 @@
                   --})
             },
             diagnostics = {
+                virtual_text = false,
+                signs = true,
+                float = { border = "rounded" },
                 enabled = true,  -- Ensure diagnostics are enabled
                 -- You can customize other aspects of diagnostics here
               },
+          })
+
+          vim.diagnostic.config({
+            virtual_text = false,
+            signs = true,
+            float = { border = "rounded" },
+          })
+
+          require("trouble").setup({
+            mode = "document_diagnostics", -- or "workspace_diagnostics"
+            auto_open = false,
           })
 
 
@@ -1557,15 +1660,29 @@
 
 
 
-          vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+          vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions,globals"
 
           --function restore_nvim_tree()
            -- nvim_tree.change_dir(vim.fn.getcwd())
             --nvim_tree.refresh()
           --end
 
+          require("aerial").setup({
+            --open_automatic = true,
+            --open_automatic = true,
+            on_attach = function(bufnr)
+              wk.register({
+                  J = { "<cmd>AerialNext<CR>zz", "Next Symbol" },
+                  K = { "<cmd>AerialPrev<CR>zz", "Previous Symbol" },
+              })
+            end,
+          })
+          vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
+
 
           local opts = {
+            pre_save_cmds = { "AerialClose" }, 
+            -- Before saving, record if Aerial is open, then close it
             enabled = true, -- Enables/disables auto creating, saving and restoring
             root_dir = vim.fn.stdpath "data" .. "/sessions/", -- Root dir where sessions will be stored
             auto_save = true, -- Enables/disables auto saving session on exit
@@ -1626,6 +1743,7 @@
 
 
 
+
           vim.cmd[[colorscheme tokyonight]]
 
 
@@ -1667,6 +1785,8 @@
 
   programs.zsh.enable = true;
 
-  services.nix-daemon.enable = true;
+  nix.enable  = true;
+  system.primaryUser = "magnus";
+  #services.nix-daemon.enable = true;
 
 }

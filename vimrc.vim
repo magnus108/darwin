@@ -32,7 +32,7 @@ set ruler
 set rulerformat=%c\ %L\ %P
 set showmatch
 set showmode
-set showtabline=2
+set showtabline=1
 set smartcase
 set smarttab
 set expandtab
