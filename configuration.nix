@@ -1,9 +1,16 @@
 { pkgs,  ... }:
 
 {
+
   nix.settings = {
-    substituters = [ "https://cache.iog.io" ];
-    trusted-public-keys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" ];
+    substituters = [
+      "https://cache.iog.io"
+      "https://cache.nixos.org"   # put the official cache back
+    ];
+    trusted-public-keys = [
+      "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="
+      "cache.nixos.org-1:iE3HTuZ89WAFt68U8mY+uePXm+nHEilHN2f+mW2C08o="
+    ];
     experimental-features = [ "nix-command" "flakes" ];
   };
 
