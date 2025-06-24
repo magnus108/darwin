@@ -2,8 +2,10 @@
   description = "Darwin configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    darwin.url = "github:lnl7/nix-darwin";
+    nixpkgs.url          = "github:NixOS/nixpkgs/nixos-25.05";
+
+    # keep nix-darwin & home-manager, but make them follow that nixpkgs
+    darwin.url           = "github:lnl7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
