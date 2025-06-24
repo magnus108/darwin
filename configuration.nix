@@ -2,6 +2,10 @@
 
 {
 
+ # nix.package = pkgs.nixStable;
+
+  nix.package = pkgs.nixVersions.nix_2_29;
+
   nix.settings = {
     substituters = [
       "https://cache.iog.io"
